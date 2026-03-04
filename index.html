@@ -1989,7 +1989,7 @@
         15 East 52nd Street<br>
         New York, NY 10022<br><br>
         +1 (212) 555-0182<br>
-        reservations@aurum.com
+        <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6c1e091f091e1a0d180503021f2c0d191e1901420f0301">[email&#160;protected]</a>
       </div>
     </div>
     <div>
@@ -2035,7 +2035,7 @@
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ─── TAB SWITCHING ───────────────────────────────────────────
   function showPanel(id, btn) {
     document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
@@ -2093,24 +2093,23 @@
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   }
 
-  // ─── STORAGE HELPERS ──────────────────────────────────────────
-  const STORAGE_KEY = 'aurum-reservations';
+  // ─── SUPABASE CONFIG ──────────────────────────────────────────
+  // 🔧 REPLACE these two values with your own from Supabase dashboard
+  // Project Settings → API → Project URL + anon key + service_role key
+  const SUPABASE_URL     = 'https://YOUR_PROJECT_ID.supabase.co';
+  const SUPABASE_ANON    = 'YOUR_ANON_PUBLIC_KEY';
+  const SUPABASE_SERVICE = 'YOUR_SERVICE_ROLE_KEY';
 
-  async function loadReservations() {
-    try {
-      const result = await window.storage.get(STORAGE_KEY);
-      if (result && result.value) return JSON.parse(result.value);
-    } catch(e) {}
-    return [];
+  // ─── SUPABASE HELPERS ─────────────────────────────────────────
+  function sbHeaders(key) {
+    return {
+      'Content-Type': 'application/json',
+      'apikey': key,
+      'Authorization': 'Bearer ' + key
+    };
   }
 
-  async function saveReservations(list) {
-    try {
-      await window.storage.set(STORAGE_KEY, JSON.stringify(list));
-    } catch(e) { console.error('Storage save failed', e); }
-  }
-
-  // ─── SUBMIT ───────────────────────────────────────────────────
+  // ─── SUBMIT TO SUPABASE ───────────────────────────────────────
   async function submitReservation() {
     const first    = document.getElementById('f_first').value.trim();
     const last     = document.getElementById('f_last').value.trim();
@@ -2133,22 +2132,46 @@
     document.getElementById('submitBtnText').textContent = 'Saving…';
 
     const ref = 'AUR-' + Date.now().toString(36).toUpperCase();
-    const reservation = {
-      id: ref,
-      first, last, email, phone,
-      date, time, guests, occasion, notes,
-      createdAt: new Date().toISOString()
-    };
 
-    const list = await loadReservations();
-    list.unshift(reservation);
-    await saveReservations(list);
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/reservations', {
+        method: 'POST',
+        headers: { ...sbHeaders(SUPABASE_ANON), 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ ref, first, last, email, phone, date, time, guests, occasion, notes })
+      });
 
-    // Show success
-    document.getElementById('modalFormHeader').style.display = 'none';
-    document.getElementById('modalFormBody').style.display = 'none';
-    document.getElementById('successRef').textContent = ref;
-    document.getElementById('modalSuccess').classList.add('show');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Insert failed');
+      }
+
+      document.getElementById('modalFormHeader').style.display = 'none';
+      document.getElementById('modalFormBody').style.display = 'none';
+      document.getElementById('successRef').textContent = ref;
+      document.getElementById('modalSuccess').classList.add('show');
+
+    } catch (err) {
+      console.error('Supabase error:', err);
+      document.getElementById('formError').textContent = 'Something went wrong: ' + err.message;
+      document.getElementById('formError').style.display = 'block';
+      btn.disabled = false;
+      document.getElementById('submitBtnText').textContent = 'Confirm Reservation';
+    }
+  }
+
+  // ─── LOAD FROM SUPABASE ───────────────────────────────────────
+  async function loadReservations() {
+    try {
+      const res = await fetch(
+        SUPABASE_URL + '/rest/v1/reservations?select=*&order=created_at.desc&limit=500',
+        { headers: sbHeaders(SUPABASE_SERVICE) }
+      );
+      if (!res.ok) throw new Error('Load failed');
+      return await res.json();
+    } catch (err) {
+      console.error('Load error:', err);
+      return [];
+    }
   }
 
   // ─── ADMIN PANEL ──────────────────────────────────────────────
@@ -2164,42 +2187,64 @@
   }
 
   async function renderAdmin() {
+    const body = document.getElementById('adminBody');
+    body.innerHTML = `<div class="admin-empty"><div class="admin-empty-title" style="color:var(--gold-dim)">Loading…</div></div>`;
+
     const list = await loadReservations();
     const search = (document.getElementById('adminSearch').value || '').toLowerCase();
     const filterOccasion = document.getElementById('adminFilter').value;
 
     let filtered = list.filter(r => {
-      const hay = `${r.first} ${r.last} ${r.email} ${r.date} ${r.guests} ${r.occasion}`.toLowerCase();
-      const matchSearch = !search || hay.includes(search);
-      const matchOccasion = !filterOccasion || r.occasion === filterOccasion;
-      return matchSearch && matchOccasion;
+      const hay = [r.first, r.last, r.email, r.date, r.guests, r.occasion, r.ref]
+        .join(' ').toLowerCase();
+      return (!search || hay.includes(search)) &&
+             (!filterOccasion || r.occasion === filterOccasion);
     });
 
     document.getElementById('adminCount').textContent =
       filtered.length + ' booking' + (filtered.length !== 1 ? 's' : '');
 
-    const body = document.getElementById('adminBody');
-
     if (filtered.length === 0) {
       body.innerHTML = `
         <div class="admin-empty">
           <div class="admin-empty-title">No reservations found</div>
-          <div class="admin-empty-sub">${list.length === 0 ? 'The book is empty — share the reservation link with guests.' : 'Try adjusting your search or filters.'}</div>
+          <div class="admin-empty-sub">${list.length === 0
+            ? 'The book is empty — share the reservation link with guests.'
+            : 'Try adjusting your search or filters.'}</div>
         </div>`;
       return;
     }
 
     const rows = filtered.map(r => {
-      const d = r.date ? new Date(r.date + 'T12:00:00').toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '—';
-      const created = new Date(r.createdAt).toLocaleDateString('en-US', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      const d = r.date
+        ? new Date(r.date + 'T12:00:00').toLocaleDateString('en-US',
+            { weekday:'short', month:'short', day:'numeric', year:'numeric' })
+        : '—';
+      const created = r.created_at
+        ? new Date(r.created_at).toLocaleDateString('en-US',
+            { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })
+        : '—';
       return `<tr>
-        <td><span class="td-ref">${r.id}</span><br><span class="td-muted">${created}</span></td>
-        <td><strong>${escHtml(r.first)} ${escHtml(r.last)}</strong><br><span class="td-muted">${escHtml(r.email)}</span>${r.phone ? '<br><span class="td-muted">'+escHtml(r.phone)+'</span>' : ''}</td>
+        <td>
+          <span class="td-ref">${escHtml(r.ref || '—')}</span><br>
+          <span class="td-muted">${created}</span>
+        </td>
+        <td>
+          <strong>${escHtml(r.first)} ${escHtml(r.last)}</strong><br>
+          <span class="td-muted">${escHtml(r.email)}</span>
+          ${r.phone ? '<br><span class="td-muted">' + escHtml(r.phone) + '</span>' : ''}
+        </td>
         <td>${d}<br><span class="td-muted">${escHtml(r.time)}</span></td>
         <td>${escHtml(r.guests)}</td>
-        <td>${r.occasion ? '<span class="td-tag">'+escHtml(r.occasion)+'</span>' : '<span class="td-muted">—</span>'}</td>
-        <td style="max-width:180px"><span class="td-muted">${r.notes ? escHtml(r.notes).substring(0,80)+(r.notes.length>80?'…':'') : '—'}</span></td>
-        <td><button class="btn-delete-row" onclick="deleteReservation('${r.id}')">Delete</button></td>
+        <td>${r.occasion
+          ? '<span class="td-tag">' + escHtml(r.occasion) + '</span>'
+          : '<span class="td-muted">—</span>'}</td>
+        <td style="max-width:180px">
+          <span class="td-muted">${r.notes
+            ? escHtml(r.notes).substring(0,80) + (r.notes.length > 80 ? '…' : '')
+            : '—'}</span>
+        </td>
+        <td><button class="btn-delete-row" onclick="deleteReservation(${r.id})">Delete</button></td>
       </tr>`;
     }).join('');
 
@@ -2221,9 +2266,16 @@
   }
 
   async function deleteReservation(id) {
-    if (!confirm('Delete reservation ' + id + '?')) return;
-    const list = await loadReservations();
-    await saveReservations(list.filter(r => r.id !== id));
+    if (!confirm('Delete reservation #' + id + '?')) return;
+    try {
+      const res = await fetch(
+        SUPABASE_URL + '/rest/v1/reservations?id=eq.' + id,
+        { method: 'DELETE', headers: sbHeaders(SUPABASE_SERVICE) }
+      );
+      if (!res.ok) throw new Error('Delete failed');
+    } catch (err) {
+      alert('Error deleting: ' + err.message);
+    }
     await renderAdmin();
   }
 
@@ -2231,22 +2283,28 @@
     const list = await loadReservations();
     if (list.length === 0) return;
     if (!confirm('Delete ALL ' + list.length + ' reservation(s)? This cannot be undone.')) return;
-    await saveReservations([]);
+    try {
+      // Delete all rows — using a always-true filter
+      const res = await fetch(
+        SUPABASE_URL + '/rest/v1/reservations?id=gte.0',
+        { method: 'DELETE', headers: sbHeaders(SUPABASE_SERVICE) }
+      );
+      if (!res.ok) throw new Error('Clear failed');
+    } catch (err) {
+      alert('Error clearing: ' + err.message);
+    }
     await renderAdmin();
   }
 
   function escHtml(str) {
-    return String(str)
+    return String(str || '')
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
       .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
-  // Keyboard ESC to close
+  // Keyboard ESC to close modals
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      closeReservation();
-      closeAdmin();
-    }
+    if (e.key === 'Escape') { closeReservation(); closeAdmin(); }
   });
 </script>
 
