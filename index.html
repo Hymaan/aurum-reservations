@@ -1401,6 +1401,15 @@
   @media (max-width: 500px) {
     .dish-grid { grid-template-columns: 1fr; }
   }
+
+  @media (max-width: 700px) {
+    .form-row { grid-template-columns: 1fr; }
+    .modal-header, .modal-body { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .admin-header { padding: 1rem 1.25rem; }
+    .admin-body { padding: 1rem 1.25rem; }
+    .reservations-table { display: block; overflow-x: auto; }
+  }
+</style>
 </head>
 <body>
 
@@ -1469,6 +1478,14 @@
       </div>
 
       <!-- ─── DISH SELECTION ─── -->
+      <div style="margin:1.75rem 0 1rem;padding:1rem 1.25rem;background:rgba(201,168,76,0.06);border:1px solid var(--divider);display:flex;align-items:center;gap:0.75rem;">
+        <span style="color:var(--gold);font-size:1rem;">🍽</span>
+        <div>
+          <div style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:300;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);">Pre-Order Your Dishes</div>
+          <div style="font-family:'Raleway',sans-serif;font-size:0.7rem;font-weight:200;color:var(--text-muted);margin-top:0.2rem;">Select what you'd like — optional but helps us prepare</div>
+        </div>
+      </div>
+
       <div class="dish-section-title">🍗 Chicken Starters</div>
       <div class="dish-grid">
         <div class="dish-chip" onclick="toggleDish(this,'Chicken Popcorn')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Popcorn</span></div>
