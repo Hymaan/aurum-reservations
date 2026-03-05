@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AURUM — Admin Dashboard</title>
+<title>Coastal Dine — Admin Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Raleway:wght@200;300;400;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -638,7 +638,7 @@
 <!-- ═══════════════════════════════════════════ -->
 <div id="loginScreen">
   <div class="login-box">
-    <div class="login-logo">AURUM</div>
+    <div class="login-logo">COASTAL DINE</div>
     <div class="login-sub">Staff Portal · Restricted Access</div>
 
     <div class="login-card">
@@ -670,7 +670,7 @@
   <!-- Top Bar -->
   <div class="topbar">
     <div class="topbar-left">
-      <div class="topbar-logo">AURUM</div>
+      <div class="topbar-logo">COASTAL DINE</div>
       <div class="topbar-badge">Admin Dashboard</div>
     </div>
     <div class="topbar-right">
@@ -753,9 +753,9 @@
 
 <script>
   // ─── SECRET URL KEY GUARD ──────────────────────────────────
-  // Page is completely hidden unless URL contains ?key=aurum-secret-2025
+  // Page is completely hidden unless URL contains ?key=coastaldine-secret-2025
   // Change this to anything you want — keep it secret!
-  const SECRET_KEY = 'aurum-secret-2025';
+  const SECRET_KEY = 'coastaldine-secret-2025';
 
   (function() {
     const params = new URLSearchParams(window.location.search);
@@ -772,7 +772,7 @@
   // ─── CONFIG ────────────────────────────────────────────────
   // 🔧 Change these to your real admin credentials
   const ADMIN_CREDENTIALS = {
-    admin:  'aurum2025',
+    admin:  'coastaldine2025',
     manager: 'manager123'
   };
 
@@ -806,7 +806,7 @@
     setTimeout(() => {
       if (ADMIN_CREDENTIALS[user] && ADMIN_CREDENTIALS[user] === pass) {
         currentUser = user;
-        sessionStorage.setItem('aurum_admin', user);
+        sessionStorage.setItem('coastaldine_admin', user);
         showDashboard();
       } else {
         showLoginError('Invalid username or password.');
@@ -817,7 +817,7 @@
   }
 
   function doLogout() {
-    sessionStorage.removeItem('aurum_admin');
+    sessionStorage.removeItem('coastaldine_admin');
     currentUser = null;
     allReservations = [];
     document.getElementById('loginUser').value = '';
@@ -844,7 +844,7 @@
 
   // Auto-login if session exists
   window.addEventListener('DOMContentLoaded', () => {
-    const saved = sessionStorage.getItem('aurum_admin');
+    const saved = sessionStorage.getItem('coastaldine_admin');
     if (saved && ADMIN_CREDENTIALS[saved] !== undefined) {
       currentUser = saved;
       showDashboard();
@@ -1123,7 +1123,7 @@
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href = url;
-    a.download = 'aurum-reservations-' + new Date().toISOString().split('T')[0] + '.csv';
+    a.download = 'coastaldine-reservations-' + new Date().toISOString().split('T')[0] + '.csv';
     a.click();
     URL.revokeObjectURL(url);
     showToast('✓ CSV exported');
