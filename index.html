@@ -1312,14 +1312,95 @@
   }
   .admin-trigger:hover { color: var(--gold-dim); }
 
-  @media (max-width: 700px) {
-    .form-row { grid-template-columns: 1fr; }
-    .modal-header, .modal-body { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .admin-header { padding: 1rem 1.25rem; }
-    .admin-body { padding: 1rem 1.25rem; }
-    .reservations-table { display: block; overflow-x: auto; }
+  /* ─── DISH SELECTION ─── */
+  .dish-section-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 200;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin: 1.75rem 0 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
-</style>
+  .dish-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--divider);
+  }
+  .dish-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .dish-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.9rem;
+    background: var(--mid);
+    border: 1px solid rgba(201,168,76,0.1);
+    cursor: pointer;
+    transition: all 0.25s;
+    user-select: none;
+  }
+  .dish-chip:hover {
+    border-color: rgba(201,168,76,0.35);
+    background: var(--charcoal);
+  }
+  .dish-chip.selected {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.08);
+  }
+  .dish-chip-check {
+    width: 14px; height: 14px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 2px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: var(--gold);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .dish-chip.selected .dish-chip-check {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--dark);
+  }
+  .dish-chip-name {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.3;
+  }
+  .dish-chip.selected .dish-chip-name { color: var(--gold-light); }
+
+  .dish-summary {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid var(--divider);
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 300;
+    color: var(--gold-dim);
+    letter-spacing: 0.05em;
+    min-height: 2.5rem;
+    display: none;
+  }
+  .dish-summary.visible { display: block; }
+  .dish-summary strong { color: var(--gold); font-weight: 400; }
+
+  @media (max-width: 500px) {
+    .dish-grid { grid-template-columns: 1fr; }
+  }
 </head>
 <body>
 
@@ -1386,7 +1467,71 @@
           </select>
         </div>
       </div>
-      <div class="form-row single">
+
+      <!-- ─── DISH SELECTION ─── -->
+      <div class="dish-section-title">🍗 Chicken Starters</div>
+      <div class="dish-grid">
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Popcorn')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Popcorn</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Lollipop')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Lollipop</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken 65')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken 65</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Wings')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Wings</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Pakora')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Pakora</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Strips')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Strips</span></div>
+      </div>
+
+      <div class="dish-section-title">🍛 Meals & Combos</div>
+      <div class="dish-grid">
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Biryani Combo')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Biryani Combo</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Mutton Biryani Combo')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mutton Biryani Combo</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Ghee Rice Combo')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Ghee Rice Combo</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Boiled Rice with Curry')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Boiled Rice with Curry</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Thali')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Thali</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Mutton Thali')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mutton Thali</span></div>
+      </div>
+
+      <div class="dish-section-title">🫓 Dinner Specials</div>
+      <div class="dish-grid">
+        <div class="dish-chip" onclick="toggleDish(this,'Kerala Parota')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Kerala Parota</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Chapathi')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chapathi</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Rice Pathiri')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Rice Pathiri</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Idiyappam')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Idiyappam</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Plain Dosa')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Plain Dosa</span></div>
+      </div>
+
+      <div class="dish-section-title">🥘 Curries</div>
+      <div class="dish-grid">
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Ghee Roast')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Ghee Roast</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Sukka')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Sukka</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Mutton Rogan Josh')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mutton Rogan Josh</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Beef Fry')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Beef Fry</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Chicken Curry')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Curry</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Mutton Stew')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mutton Stew</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Beef Masala')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Beef Masala</span></div>
+      </div>
+
+      <div class="dish-section-title">🍨 Desserts</div>
+      <div class="dish-grid">
+        <div class="dish-chip" onclick="toggleDish(this,'Gadbad Ice Cream')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Gadbad Ice Cream</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Caramel Custard')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Caramel Custard</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Gulab Jamun')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Gulab Jamun</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Kesari Bath')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Kesari Bath</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Payasam')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Payasam</span></div>
+      </div>
+
+      <div class="dish-section-title">🥤 Drinks</div>
+      <div class="dish-grid">
+        <div class="dish-chip" onclick="toggleDish(this,'Fresh Lime Soda')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Fresh Lime Soda</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Mango Lassi')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mango Lassi</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Buttermilk')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Buttermilk</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Cold Coffee')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Cold Coffee</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Falooda')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Falooda</span></div>
+        <div class="dish-chip" onclick="toggleDish(this,'Soft Drinks')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Soft Drinks</span></div>
+      </div>
+
+      <!-- Selection summary -->
+      <div class="dish-summary" id="dishSummary"></div>
+
+      <div class="form-row single" style="margin-top:1.25rem;">
         <div class="form-group">
           <label class="form-label">Special Requests</label>
           <textarea class="form-textarea" id="f_notes" placeholder="Dietary requirements, allergies, special arrangements..."></textarea>
@@ -1398,13 +1543,13 @@
       <p class="form-note" id="formError" style="color:#e07060;display:none;">Please fill in all required fields.</p>
       <p class="form-note">We will confirm your reservation within 2 hours by email.</p>
     </div>
-    <!-- Success Screen -->
     <div class="modal-success" id="modalSuccess">
       <div class="success-icon">✦</div>
       <div class="success-title">Reservation <em>Confirmed</em></div>
-      <p class="success-text">Thank you. We look forward to welcoming you to Aurum.<br>A confirmation has been noted for your records.</p>
+      <p class="success-text">Thank you. We look forward to welcoming you.<br>A confirmation has been noted for your records.</p>
+      <div id="successDishes" style="display:none;max-width:380px;margin:0 auto 1.25rem;text-align:left;padding:0.9rem 1.25rem;border:1px solid var(--divider);background:rgba(201,168,76,0.04);"></div>
       <div class="success-ref" id="successRef">—</div>
-      <button class="btn-gold" onclick="closeReservation()" style="border:none;"><span>Close</span></button>
+      <button class="btn-gold" onclick="closeReservation()" style="border:none;margin-top:1.5rem;"><span>Close</span></button>
     </div>
   </div>
 </div>
@@ -2025,10 +2170,38 @@
     document.getElementById('modalFormBody').style.display = '';
     document.getElementById('modalSuccess').classList.remove('show');
     document.getElementById('formError').style.display = 'none';
+    document.getElementById('formError').textContent = 'Please fill in all required fields.';
     document.getElementById('submitBtn').disabled = false;
     document.getElementById('submitBtnText').textContent = 'Confirm Reservation';
     ['f_first','f_last','f_email','f_phone','f_date','f_time','f_guests','f_occasion','f_notes']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    // Reset dish chips
+    document.querySelectorAll('.dish-chip').forEach(c => c.classList.remove('selected'));
+    document.getElementById('dishSummary').classList.remove('visible');
+    document.getElementById('dishSummary').innerHTML = '';
+  }
+
+  // ─── DISH SELECTION ───────────────────────────────────────────
+  function toggleDish(chip, name) {
+    chip.classList.toggle('selected');
+    updateDishSummary();
+  }
+
+  function getSelectedDishes() {
+    return Array.from(document.querySelectorAll('.dish-chip.selected'))
+      .map(c => c.querySelector('.dish-chip-name').textContent.trim());
+  }
+
+  function updateDishSummary() {
+    const dishes = getSelectedDishes();
+    const summary = document.getElementById('dishSummary');
+    if (dishes.length === 0) {
+      summary.classList.remove('visible');
+      summary.innerHTML = '';
+    } else {
+      summary.classList.add('visible');
+      summary.innerHTML = '<strong>' + dishes.length + ' dish' + (dishes.length > 1 ? 'es' : '') + ' selected:</strong> ' + dishes.join(', ');
+    }
   }
 
   // ─── SUPABASE CONFIG ──────────────────────────────────────────
@@ -2070,12 +2243,15 @@
     document.getElementById('submitBtnText').textContent = 'Saving…';
 
     const ref = 'AUR-' + Date.now().toString(36).toUpperCase();
+    const selectedDishes = getSelectedDishes();
 
     try {
       const res = await fetch(SUPABASE_URL + '/rest/v1/reservations', {
         method: 'POST',
         headers: { ...sbHeaders(SUPABASE_ANON), 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ ref, first, last, email, phone, date, time, guests, occasion, notes, created_at: new Date().toISOString() })
+        body: JSON.stringify({ ref, first, last, email, phone, date, time, guests, occasion, notes,
+          dishes: selectedDishes.length > 0 ? selectedDishes.join(', ') : null,
+          created_at: new Date().toISOString() })
       });
 
       if (!res.ok) {
@@ -2086,6 +2262,17 @@
       document.getElementById('modalFormHeader').style.display = 'none';
       document.getElementById('modalFormBody').style.display = 'none';
       document.getElementById('successRef').textContent = ref;
+      // Show selected dishes on success
+      const dishes = getSelectedDishes();
+      const successDishes = document.getElementById('successDishes');
+      if (successDishes) {
+        if (dishes.length > 0) {
+          successDishes.innerHTML = '<div style="font-family:\'Raleway\',sans-serif;font-size:0.72rem;font-weight:300;color:var(--text-muted);margin-bottom:1rem;line-height:1.8;"><span style="color:var(--gold-dim);letter-spacing:0.2em;font-size:0.6rem;text-transform:uppercase;">Pre-selected dishes</span><br>' + dishes.join(' · ') + '</div>';
+          successDishes.style.display = 'block';
+        } else {
+          successDishes.style.display = 'none';
+        }
+      }
       document.getElementById('modalSuccess').classList.add('show');
 
     } catch (err) {
@@ -2177,7 +2364,12 @@
         <td>${r.occasion
           ? '<span class="td-tag">' + escHtml(r.occasion) + '</span>'
           : '<span class="td-muted">—</span>'}</td>
-        <td style="max-width:180px">
+        <td style="max-width:200px">
+          <span class="td-muted" style="color:var(--gold-dim);font-size:0.68rem;">${r.dishes
+            ? escHtml(r.dishes).substring(0,100) + (r.dishes.length > 100 ? '…' : '')
+            : '<em>No pre-selection</em>'}</span>
+        </td>
+        <td style="max-width:150px">
           <span class="td-muted">${r.notes
             ? escHtml(r.notes).substring(0,80) + (r.notes.length > 80 ? '…' : '')
             : '—'}</span>
@@ -2195,6 +2387,7 @@
             <th>Date · Time</th>
             <th>Party</th>
             <th>Occasion</th>
+            <th>Dishes</th>
             <th>Notes</th>
             <th></th>
           </tr>
