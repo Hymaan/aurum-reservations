@@ -731,12 +731,79 @@
   }
   .notif-dismiss:hover { color: var(--gold); }
 
+  /* ─── SECTION HEADERS ─── */
+  .panel-header {
+    padding: 1.5rem 2rem 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 1rem;
+  }
+  .panel-header-left { display: flex; align-items: center; gap: 1.25rem; }
+  .panel-header-icon {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .panel-header-icon.res  { background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25); }
+  .panel-header-icon.tw   { background: rgba(106,191,122,0.12); border: 1px solid rgba(106,191,122,0.25); }
+  .panel-header-icon.dine { background: rgba(126,200,227,0.12); border: 1px solid rgba(126,200,227,0.25); }
+  .panel-header-eyebrow {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.52rem; font-weight: 200;
+    letter-spacing: 0.45em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 0.3rem;
+  }
+  .panel-header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem; font-weight: 300;
+    color: var(--cream); line-height: 1;
+  }
+  .panel-header-title em { font-style: italic; }
+  .panel-header-title.res  em { color: var(--gold); }
+  .panel-header-title.tw   em { color: #6abf7a; }
+  .panel-header-title.dine em { color: #7ec8e3; }
+  .panel-header-desc {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.65rem; font-weight: 200;
+    color: var(--text-muted); margin-top: 0.35rem;
+    letter-spacing: 0.05em;
+  }
+  .panel-mini-stats {
+    display: flex; gap: 1.5rem; padding-bottom: 0.25rem;
+  }
+  .panel-mini-stat { text-align: right; }
+  .panel-mini-stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem; font-weight: 300; line-height: 1;
+  }
+  .panel-mini-stat-val.res  { color: var(--gold); }
+  .panel-mini-stat-val.tw   { color: #6abf7a; }
+  .panel-mini-stat-val.dine { color: #7ec8e3; }
+  .panel-mini-stat-label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.52rem; font-weight: 200;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-muted); margin-top: 0.15rem;
+  }
+  .panel-divider {
+    height: 1px; background: var(--divider);
+    margin: 1.25rem 2rem 0;
+    flex-shrink: 0;
+  }
+
   @media (max-width: 768px) {
     .stats-bar { display: none; }
     .search-input { width: 160px; }
     .topbar-badge { display: none; }
     .data-table { display: block; overflow-x: auto; }
     .detail-grid { grid-template-columns: 1fr; }
+    .panel-header { padding: 1rem 1rem 0; }
+    .panel-mini-stats { display: none; }
+    .panel-divider { margin: 1rem 1rem 0; }
   }
 </style>
 </head>
@@ -802,6 +869,10 @@
       <div class="stat-value gold" id="statTakeaway">—</div>
     </div>
     <div class="stat-card">
+      <div class="stat-label">Dining Orders</div>
+      <div class="stat-value" style="color:#7ec8e3;" id="statDining">—</div>
+    </div>
+    <div class="stat-card">
       <div class="stat-label">Today</div>
       <div class="stat-value" id="statToday">—</div>
     </div>
@@ -827,10 +898,39 @@
     <button class="tab-btn-admin" id="tabTakeaway" onclick="switchTab('takeaway')">
       🛍 Takeaway Orders <span class="tab-badge tw" id="tabBadgeTw">0</span>
     </button>
+    <button class="tab-btn-admin" id="tabDining" onclick="switchTab('dining')">
+      🪑 Dining Orders <span class="tab-badge" style="background:#7ec8e3;color:#0e0c0a;" id="tabBadgeDining">0</span>
+    </button>
   </div>
 
-  <!-- ── RESERVATIONS TAB ── -->
+  <!-- ══════════════════════════════════════════ -->
+  <!-- ── RESERVATIONS PANEL ──                  -->
+  <!-- ══════════════════════════════════════════ -->
   <div id="panelReservations" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+
+    <div class="panel-header">
+      <div class="panel-header-left">
+        <div class="panel-header-icon res">🍽</div>
+        <div>
+          <div class="panel-header-eyebrow">Coastal Dine · Table Bookings</div>
+          <div class="panel-header-title res">Table <em>Reservations</em></div>
+          <div class="panel-header-desc">Advance bookings with guest details, occasion & pre-ordered dishes</div>
+        </div>
+      </div>
+      <div class="panel-mini-stats">
+        <div class="panel-mini-stat">
+          <div class="panel-mini-stat-val res" id="miniStatResTotal">—</div>
+          <div class="panel-mini-stat-label">Total</div>
+        </div>
+        <div class="panel-mini-stat">
+          <div class="panel-mini-stat-val res" id="miniStatResToday">—</div>
+          <div class="panel-mini-stat-label">Today</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-divider"></div>
+
     <div class="toolbar">
       <input class="search-input" id="searchInput" placeholder="🔍  Search name, email, date, ref…" oninput="renderTable()">
       <select class="filter-select" id="filterDate" onchange="renderTable()">
@@ -841,12 +941,9 @@
       </select>
       <select class="filter-select" id="filterOccasion" onchange="renderTable()">
         <option value="">All Occasions</option>
-        <option>Anniversary</option>
-        <option>Birthday</option>
-        <option>Business Dinner</option>
-        <option>Engagement</option>
-        <option>Date Night</option>
-        <option>Other</option>
+        <option>Anniversary</option><option>Birthday</option>
+        <option>Business Dinner</option><option>Engagement</option>
+        <option>Date Night</option><option>Other</option>
       </select>
       <div class="toolbar-right">
         <button class="btn-outline" onclick="exportCSV()">⬇ Export CSV</button>
@@ -854,13 +951,41 @@
         <button class="btn-danger" onclick="clearAll()">⊘ Clear All</button>
       </div>
     </div>
+
     <div class="table-wrap" id="tableWrap">
-      <div class="state-box"><div class="state-icon">⟳</div><div class="state-title">Loading…</div></div>
+      <div class="state-box"><div class="state-icon">⟳</div><div class="state-title">Loading reservations…</div></div>
     </div>
+
   </div>
 
-  <!-- ── TAKEAWAY TAB ── -->
+  <!-- ══════════════════════════════════════════ -->
+  <!-- ── TAKEAWAY ORDERS PANEL ──               -->
+  <!-- ══════════════════════════════════════════ -->
   <div id="panelTakeaway" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+
+    <div class="panel-header">
+      <div class="panel-header-left">
+        <div class="panel-header-icon tw">🛍</div>
+        <div>
+          <div class="panel-header-eyebrow">Coastal Dine · Takeaway</div>
+          <div class="panel-header-title tw">Takeaway <em>Orders</em></div>
+          <div class="panel-header-desc">Customer orders for pickup — name, phone, pickup time & items</div>
+        </div>
+      </div>
+      <div class="panel-mini-stats">
+        <div class="panel-mini-stat">
+          <div class="panel-mini-stat-val tw" id="miniStatTwTotal">—</div>
+          <div class="panel-mini-stat-label">Total</div>
+        </div>
+        <div class="panel-mini-stat">
+          <div class="panel-mini-stat-val tw" id="miniStatTwToday">—</div>
+          <div class="panel-mini-stat-label">Today</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-divider" style="background:rgba(106,191,122,0.15);"></div>
+
     <div class="toolbar">
       <input class="search-input" id="twSearch" placeholder="🔍  Search name, phone, ref…" oninput="renderTakeaway()">
       <select class="filter-select" id="twFilterDate" onchange="renderTakeaway()">
@@ -875,9 +1000,66 @@
         <button class="btn-danger" onclick="clearAllTakeaway()">⊘ Clear All</button>
       </div>
     </div>
+
     <div class="table-wrap" id="twTableWrap">
-      <div class="state-box"><div class="state-icon">⟳</div><div class="state-title">Loading…</div></div>
+      <div class="state-box"><div class="state-icon">⟳</div><div class="state-title">Loading takeaway orders…</div></div>
     </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- ── DINING ORDERS PANEL ──                 -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="panelDining" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+
+    <div class="panel-header">
+      <div class="panel-header-left">
+        <div class="panel-header-icon dine">🪑</div>
+        <div>
+          <div class="panel-header-eyebrow">Coastal Dine · Dine In</div>
+          <div class="panel-header-title dine">Dining <em>Orders</em></div>
+          <div class="panel-header-desc">Live orders placed by seated customers from their table</div>
+        </div>
+      </div>
+      <div class="panel-mini-stats">
+        <div class="panel-mini-stat">
+          <div class="panel-mini-stat-val dine" id="miniStatDineTotal">—</div>
+          <div class="panel-mini-stat-label">Total</div>
+        </div>
+        <div class="panel-mini-stat">
+          <div class="panel-mini-stat-val dine" id="miniStatDineToday">—</div>
+          <div class="panel-mini-stat-label">Today</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-divider" style="background:rgba(126,200,227,0.15);"></div>
+
+    <div class="toolbar">
+      <input class="search-input" id="diningSearch" placeholder="🔍  Search table, phone, ref…" oninput="renderDining()">
+      <select class="filter-select" id="diningFilterTable" onchange="renderDining()">
+        <option value="">All Tables</option>
+        <option>Table 1</option><option>Table 2</option><option>Table 3</option><option>Table 4</option><option>Table 5</option>
+        <option>Table 6</option><option>Table 7</option><option>Table 8</option><option>Table 9</option><option>Table 10</option>
+        <option>Table 11</option><option>Table 12</option><option>Table 13</option><option>Table 14</option><option>Table 15</option>
+        <option>Table 16</option><option>Table 17</option><option>Table 18</option><option>Table 19</option><option>Table 20</option>
+      </select>
+      <select class="filter-select" id="diningFilterTime" onchange="renderDining()">
+        <option value="">All Time</option>
+        <option value="today">Today</option>
+        <option value="hour">Last Hour</option>
+      </select>
+      <div class="toolbar-right">
+        <button class="btn-outline" onclick="exportDiningCSV()">⬇ Export CSV</button>
+        <button class="btn-outline" onclick="loadData()">↻ Refresh</button>
+        <button class="btn-danger" onclick="clearAllDining()">⊘ Clear All</button>
+      </div>
+    </div>
+
+    <div class="table-wrap" id="diningTableWrap">
+      <div class="state-box"><div class="state-icon">⟳</div><div class="state-title">Loading dining orders…</div></div>
+    </div>
+
   </div>
 
 </div>
@@ -1007,33 +1189,39 @@
 
   function switchTab(tab) {
     activeTab = tab;
-    document.getElementById('tabReservations').classList.toggle('active', tab === 'reservations');
-    document.getElementById('tabTakeaway').classList.toggle('active', tab === 'takeaway');
-    document.getElementById('panelReservations').style.display = tab === 'reservations' ? 'flex' : 'none';
-    document.getElementById('panelTakeaway').style.display = tab === 'takeaway' ? 'flex' : 'none';
+    ['reservations','takeaway','dining'].forEach(t => {
+      const btn   = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+      const panel = document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1));
+      if (btn)   btn.classList.toggle('active', t === tab);
+      if (panel) panel.style.display = t === tab ? 'flex' : 'none';
+    });
   }
 
   // ─── DATA ──────────────────────────────────────────────────
   let allTakeawayOrders = [];
+  let allDiningOrders   = [];
 
   async function loadData() {
-    // Load both in parallel
-    document.getElementById('tableWrap').innerHTML = `<div class="state-box"><div class="state-icon" style="animation:spin 1s linear infinite;display:inline-block;">⟳</div><div class="state-title">Loading reservations…</div></div>`;
-    document.getElementById('twTableWrap').innerHTML = `<div class="state-box"><div class="state-icon" style="animation:spin 1s linear infinite;display:inline-block;">⟳</div><div class="state-title">Loading takeaway orders…</div></div>`;
+    document.getElementById('tableWrap').innerHTML      = `<div class="state-box"><div class="state-icon" style="animation:spin 1s linear infinite;display:inline-block;">⟳</div><div class="state-title">Loading reservations…</div></div>`;
+    document.getElementById('twTableWrap').innerHTML    = `<div class="state-box"><div class="state-icon" style="animation:spin 1s linear infinite;display:inline-block;">⟳</div><div class="state-title">Loading takeaway orders…</div></div>`;
+    document.getElementById('diningTableWrap').innerHTML= `<div class="state-box"><div class="state-icon" style="animation:spin 1s linear infinite;display:inline-block;">⟳</div><div class="state-title">Loading dining orders…</div></div>`;
 
     try {
-      const [resRes, twRes] = await Promise.all([
-        fetch(SUPABASE_URL + '/rest/v1/reservations?select=*&order=created_at.desc&limit=1000', { headers: SB_HEADERS }),
-        fetch(SUPABASE_URL + '/rest/v1/takeaway_orders?select=*&order=created_at.desc&limit=1000', { headers: SB_HEADERS })
+      const [resRes, twRes, diningRes] = await Promise.all([
+        fetch(SUPABASE_URL + '/rest/v1/reservations?select=*&order=created_at.desc&limit=1000',   { headers: SB_HEADERS }),
+        fetch(SUPABASE_URL + '/rest/v1/takeaway_orders?select=*&order=created_at.desc&limit=1000',{ headers: SB_HEADERS }),
+        fetch(SUPABASE_URL + '/rest/v1/table_orders?select=*&order=created_at.desc&limit=1000',   { headers: SB_HEADERS })
       ]);
 
-      if (resRes.ok) allReservations = await resRes.json();
-      if (twRes.ok)  allTakeawayOrders = await twRes.json();
+      if (resRes.ok)    allReservations   = await resRes.json();
+      if (twRes.ok)     allTakeawayOrders = await twRes.json();
+      if (diningRes.ok) allDiningOrders   = await diningRes.json();
 
       updateStats();
       renderTable();
       renderTakeaway();
-      showToast(`✓ ${allReservations.length} reservations · ${allTakeawayOrders.length} takeaway orders`);
+      renderDining();
+      showToast(`✓ ${allReservations.length} reservations · ${allTakeawayOrders.length} takeaway · ${allDiningOrders.length} dining`);
     } catch (err) {
       document.getElementById('tableWrap').innerHTML = `<div class="state-box"><div class="state-icon">⚠</div><div class="state-title">Could not load data</div><div class="state-sub">${escHtml(err.message)}</div></div>`;
     }
@@ -1041,27 +1229,40 @@
 
   // ─── STATS ─────────────────────────────────────────────────
   function updateStats() {
-    const today  = new Date().toISOString().split('T')[0];
+    const today   = new Date().toISOString().split('T')[0];
     const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
 
-    const todayCount = allReservations.filter(r => r.date === today).length
-                     + allTakeawayOrders.filter(r => r.pickup_date === today).length;
+    const resToday   = allReservations.filter(r => r.date === today).length;
+    const twToday    = allTakeawayOrders.filter(r => r.pickup_date === today).length;
+    const dineToday  = allDiningOrders.filter(r => r.created_at && r.created_at.startsWith(today)).length;
+
+    const todayCount = resToday + twToday + dineToday;
     const weekCount  = allReservations.filter(r => r.date >= weekAgo).length
                      + allTakeawayOrders.filter(r => r.pickup_date >= weekAgo).length;
-    const guestTotal = allReservations.reduce((sum, r) => {
-      return sum + (parseInt((r.guests||'').replace(/\D/g,'')) || 0);
-    }, 0);
+    const guestTotal = allReservations.reduce((sum, r) => sum + (parseInt((r.guests||'').replace(/\D/g,'')) || 0), 0);
     const withDishes = allReservations.filter(r => r.dishes && r.dishes.trim()).length;
 
+    // Main stats bar
     document.getElementById('statTotal').textContent    = allReservations.length;
     document.getElementById('statTakeaway').textContent = allTakeawayOrders.length;
+    document.getElementById('statDining').textContent   = allDiningOrders.length;
     document.getElementById('statToday').textContent    = todayCount;
     document.getElementById('statWeek').textContent     = weekCount;
     document.getElementById('statGuests').textContent   = guestTotal || '—';
     document.getElementById('statDishes').textContent   = withDishes;
 
-    document.getElementById('tabBadgeRes').textContent = allReservations.length;
-    document.getElementById('tabBadgeTw').textContent  = allTakeawayOrders.length;
+    // Tab badges
+    document.getElementById('tabBadgeRes').textContent    = allReservations.length;
+    document.getElementById('tabBadgeTw').textContent     = allTakeawayOrders.length;
+    document.getElementById('tabBadgeDining').textContent = allDiningOrders.length;
+
+    // Panel mini-stats
+    document.getElementById('miniStatResTotal').textContent  = allReservations.length;
+    document.getElementById('miniStatResToday').textContent  = resToday;
+    document.getElementById('miniStatTwTotal').textContent   = allTakeawayOrders.length;
+    document.getElementById('miniStatTwToday').textContent   = twToday;
+    document.getElementById('miniStatDineTotal').textContent = allDiningOrders.length;
+    document.getElementById('miniStatDineToday').textContent = dineToday;
   }
 
   // ─── RENDER TAKEAWAY TABLE ────────────────────────────────
@@ -1207,7 +1408,151 @@
     } catch(err) { alert('Error: ' + err.message); }
   }
 
-  // ─── EXPORT TAKEAWAY CSV ──────────────────────────────────
+  // ─── RENDER DINING TABLE ─────────────────────────────────
+  function renderDining() {
+    const search  = (document.getElementById('diningSearch').value || '').toLowerCase();
+    const fTable  = document.getElementById('diningFilterTable').value;
+    const fTime   = document.getElementById('diningFilterTime').value;
+    const today   = new Date().toISOString().split('T')[0];
+    const hourAgo = new Date(Date.now() - 60*60*1000).toISOString();
+
+    let filtered = allDiningOrders.filter(r => {
+      const hay = [r.ref, r.table_number, r.phone, r.items].join(' ').toLowerCase();
+      const matchSearch = !search || hay.includes(search);
+      const matchTable  = !fTable || r.table_number === fTable;
+      let   matchTime   = true;
+      if (fTime === 'today') matchTime = r.created_at && r.created_at.startsWith(today);
+      if (fTime === 'hour')  matchTime = r.created_at && r.created_at >= hourAgo;
+      return matchSearch && matchTable && matchTime;
+    });
+
+    const wrap = document.getElementById('diningTableWrap');
+
+    if (filtered.length === 0) {
+      wrap.innerHTML = `<div class="state-box"><div class="state-icon">🪑</div><div class="state-title">${allDiningOrders.length===0?'No dining orders yet':'No results found'}</div><div class="state-sub">${allDiningOrders.length===0?'Orders placed at tables will appear here in real time':'Try adjusting filters'}</div></div>`;
+      return;
+    }
+
+    const rows = filtered.map(r => {
+      const timeStr = r.created_at
+        ? new Date(r.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})
+        : '—';
+      const itemPills = r.items
+        ? r.items.split(',').slice(0,4).map(d => `<span class="dish-pill" style="border-color:rgba(126,200,227,0.3);color:#7ec8e3;">${escHtml(d.trim())}</span>`).join('')
+          + (r.items.split(',').length > 4 ? `<span class="dish-pill">+${r.items.split(',').length-4} more</span>` : '')
+        : '—';
+
+      return `<tr>
+        <td>
+          <div class="td-ref" style="color:#7ec8e3;">${escHtml(r.ref||'—')}</div>
+          <div class="td-muted">${timeStr}</div>
+        </td>
+        <td>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;color:var(--cream);">${escHtml(r.table_number||'—')}</div>
+        </td>
+        <td>
+          <div style="font-weight:400;">${escHtml(r.phone||'—')}</div>
+        </td>
+        <td class="td-dishes">${itemPills}</td>
+        <td>
+          <div style="display:flex;gap:0.5rem;flex-direction:column;">
+            <button class="btn-outline" style="font-size:0.55rem;padding:0.3rem 0.7rem;" onclick="viewDiningDetail(${r.id})">View</button>
+            <button class="btn-delete" onclick="deleteDining(${r.id})">Delete</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    wrap.innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Ref · Time</th>
+            <th>Table</th>
+            <th>Mobile</th>
+            <th>Items Ordered</th>
+            <th style="width:80px;"></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="padding:1rem 0;font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:200;color:var(--text-muted);letter-spacing:0.15em;">
+        Showing ${filtered.length} of ${allDiningOrders.length} order${allDiningOrders.length!==1?'s':''}
+      </div>`;
+  }
+
+  // ─── DINING DETAIL ────────────────────────────────────────
+  function viewDiningDetail(id) {
+    const r = allDiningOrders.find(x => x.id === id);
+    if (!r) return;
+    const timeStr = r.created_at
+      ? new Date(r.created_at).toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      : '—';
+    const itemsHTML = r.items
+      ? r.items.split(',').map(d => `<span class="dish-pill" style="font-size:0.68rem;padding:0.3rem 0.75rem;border-color:rgba(126,200,227,0.3);color:#7ec8e3;">${escHtml(d.trim())}</span>`).join('')
+      : '<span style="color:var(--text-muted);font-style:italic;">No items</span>';
+
+    document.getElementById('detailContent').innerHTML = `
+      <div class="detail-ref" style="color:#7ec8e3;">${escHtml(r.ref||'—')} · Dining Order</div>
+      <div class="detail-name" style="font-size:2.4rem;">${escHtml(r.table_number||'—')}</div>
+      <div class="detail-grid">
+        <div><div class="detail-field-label">Mobile Number</div><div class="detail-field-value">${escHtml(r.phone||'—')}</div></div>
+        <div><div class="detail-field-label">Order Placed</div><div class="detail-field-value">${timeStr}</div></div>
+      </div>
+      <div class="detail-dishes-section">
+        <div class="detail-dishes-title">Items Ordered</div>
+        <div class="detail-dishes-pills">${itemsHTML}</div>
+      </div>
+      <div style="margin-top:2rem;display:flex;gap:0.75rem;">
+        <button class="btn-danger" style="padding:0.6rem 1.25rem;" onclick="deleteDining(${r.id});closeDetailModal();">Delete Order</button>
+        <button class="btn-outline" style="padding:0.6rem 1.25rem;" onclick="closeDetailModal()">Close</button>
+      </div>`;
+    document.getElementById('detailOverlay').classList.add('open');
+  }
+
+  // ─── DELETE DINING ────────────────────────────────────────
+  async function deleteDining(id) {
+    if (!confirm('Delete this dining order?')) return;
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/table_orders?id=eq.' + id, { method: 'DELETE', headers: SB_HEADERS });
+      if (!res.ok) throw new Error('Delete failed');
+      allDiningOrders = allDiningOrders.filter(r => r.id !== id);
+      updateStats(); renderDining();
+      showToast('Dining order deleted');
+    } catch(err) { alert('Error: ' + err.message); }
+  }
+
+  async function clearAllDining() {
+    if (allDiningOrders.length === 0) return showToast('Nothing to clear');
+    if (!confirm(`Delete ALL ${allDiningOrders.length} dining orders? Cannot be undone.`)) return;
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/table_orders?id=gte.0', { method: 'DELETE', headers: SB_HEADERS });
+      if (!res.ok) throw new Error('Clear failed');
+      allDiningOrders = [];
+      updateStats(); renderDining();
+      showToast('All dining orders cleared');
+    } catch(err) { alert('Error: ' + err.message); }
+  }
+
+  // ─── EXPORT DINING CSV ────────────────────────────────────
+  function exportDiningCSV() {
+    if (allDiningOrders.length === 0) return showToast('No data to export');
+    const headers = ['Ref','Table','Phone','Items','Ordered On'];
+    const rows = allDiningOrders.map(r => [
+      r.ref||'', r.table_number||'', r.phone||'',
+      (r.items||'').replace(/,/g,' |'),
+      r.created_at ? new Date(r.created_at).toLocaleString() : ''
+    ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+    const csv  = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = 'coastaldine-dining-' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✓ Dining orders CSV exported');
+  }
   function exportTakeawayCSV() {
     if (allTakeawayOrders.length === 0) return showToast('No data to export');
     const headers = ['Ref','First','Last','Phone','Email','Pickup Date','Pickup Time','Items','Notes','Ordered On'];
