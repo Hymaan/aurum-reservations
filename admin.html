@@ -667,6 +667,70 @@
   }
   .tab-badge.tw { background: #6abf7a; }
 
+  /* ─── REAL-TIME FLASH ─── */
+  @keyframes rowFlash {
+    0%   { background: rgba(201,168,76,0.25); }
+    100% { background: transparent; }
+  }
+  @keyframes twRowFlash {
+    0%   { background: rgba(106,191,122,0.25); }
+    100% { background: transparent; }
+  }
+  .row-new td { animation: rowFlash 2.5s ease-out forwards; }
+  .row-new-tw td { animation: twRowFlash 2.5s ease-out forwards; }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.55rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-left: 1rem;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .notif-banner {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(-120px);
+    background: var(--charcoal);
+    border: 1px solid var(--gold);
+    padding: 0.9rem 1.75rem;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    white-space: nowrap;
+  }
+  .notif-banner.tw { border-color: var(--green); }
+  .notif-banner.show { transform: translateX(-50%) translateY(0); }
+  .notif-icon { font-size: 1.2rem; }
+  .notif-text { font-family: 'Raleway', sans-serif; font-size: 0.75rem; font-weight: 300; color: var(--cream); }
+  .notif-text strong { color: var(--gold); font-weight: 400; }
+  .notif-banner.tw .notif-text strong { color: #6abf7a; }
+  .notif-dismiss {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 0.9rem; line-height: 1;
+    transition: color 0.2s; margin-left: 0.5rem;
+  }
+  .notif-dismiss:hover { color: var(--gold); }
+
   @media (max-width: 768px) {
     .stats-bar { display: none; }
     .search-input { width: 160px; }
@@ -717,6 +781,9 @@
     <div class="topbar-left">
       <div class="topbar-logo">COASTAL DINE</div>
       <div class="topbar-badge">Admin Dashboard</div>
+      <div class="live-badge" id="liveBadge" style="display:none;">
+        <div class="live-dot"></div> Live
+      </div>
     </div>
     <div class="topbar-right">
       <div class="admin-name">Signed in as <span id="adminNameDisplay">Admin</span></div>
@@ -823,6 +890,13 @@
     <button class="detail-close" onclick="closeDetailModal()">✕</button>
     <div id="detailContent"></div>
   </div>
+</div>
+
+<!-- NOTIFICATION BANNER -->
+<div class="notif-banner" id="notifBanner">
+  <span class="notif-icon" id="notifIcon">🍽</span>
+  <div class="notif-text" id="notifText"></div>
+  <button class="notif-dismiss" onclick="dismissNotif()">✕</button>
 </div>
 
 <!-- TOAST -->
@@ -1401,6 +1475,179 @@
       .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
+  // ─── REAL-TIME POLLING ─────────────────────────────────────
+  let rtInterval = null;
+  let notifTimer = null;
+
+  function startRealtime() {
+    document.getElementById('liveBadge').style.display = 'inline-flex';
+    // Poll every 8 seconds
+    rtInterval = setInterval(pollForUpdates, 8000);
+  }
+
+  function stopRealtime() {
+    clearInterval(rtInterval);
+    document.getElementById('liveBadge').style.display = 'none';
+  }
+
+  async function pollForUpdates() {
+    try {
+      const [resRes, twRes] = await Promise.all([
+        fetch(SUPABASE_URL + '/rest/v1/reservations?select=*&order=created_at.desc&limit=1000', { headers: SB_HEADERS }),
+        fetch(SUPABASE_URL + '/rest/v1/takeaway_orders?select=*&order=created_at.desc&limit=1000', { headers: SB_HEADERS })
+      ]);
+
+      const newReservations = resRes.ok ? await resRes.json() : allReservations;
+      const newTakeaways    = twRes.ok  ? await twRes.json()  : allTakeawayOrders;
+
+      // Check for new reservations
+      const newResIds = newReservations.map(r => r.id);
+      const oldResIds = allReservations.map(r => r.id);
+      const addedRes  = newReservations.filter(r => !oldResIds.includes(r.id));
+
+      // Check for new takeaway orders
+      const newTwIds  = newTakeaways.map(r => r.id);
+      const oldTwIds  = allTakeawayOrders.map(r => r.id);
+      const addedTw   = newTakeaways.filter(r => !oldTwIds.includes(r.id));
+
+      if (addedRes.length > 0 || addedTw.length > 0) {
+        allReservations   = newReservations;
+        allTakeawayOrders = newTakeaways;
+        updateStats();
+
+        if (addedRes.length > 0) {
+          const r = addedRes[0];
+          renderTable();
+          flashNewRow(r.id, false);
+          showNotif(
+            false,
+            `New reservation — <strong>${escHtml(r.first)} ${escHtml(r.last)}</strong> · ${escHtml(r.date||'')} at ${escHtml(r.time||'')}`
+          );
+          playChime();
+        }
+
+        if (addedTw.length > 0) {
+          const r = addedTw[0];
+          renderTakeaway();
+          flashNewRow(r.id, true);
+          showNotif(
+            true,
+            `New takeaway order — <strong>${escHtml(r.first)} ${escHtml(r.last)}</strong> · Pickup ${escHtml(r.pickup_date||'')} ${escHtml(r.pickup_time||'')}`
+          );
+          playChime();
+        }
+      } else {
+        // Silently sync in case of deletions
+        allReservations   = newReservations;
+        allTakeawayOrders = newTakeaways;
+        updateStats();
+      }
+
+    } catch(e) {
+      // Silently fail — don't disrupt admin
+    }
+  }
+
+  function flashNewRow(id, isTakeaway) {
+    setTimeout(() => {
+      const table  = isTakeaway ? document.querySelector('#twTableWrap table') : document.querySelector('#tableWrap table');
+      if (!table) return;
+      const rows = table.querySelectorAll('tbody tr');
+      // First row is always the newest (ordered by created_at desc)
+      if (rows[0]) {
+        rows[0].classList.add(isTakeaway ? 'row-new-tw' : 'row-new');
+        setTimeout(() => rows[0].classList.remove(isTakeaway ? 'row-new-tw' : 'row-new'), 3000);
+      }
+    }, 200);
+  }
+
+  function showNotif(isTakeaway, html) {
+    const banner = document.getElementById('notifBanner');
+    document.getElementById('notifIcon').textContent  = isTakeaway ? '🛍' : '🍽';
+    document.getElementById('notifText').innerHTML    = html;
+    banner.className = 'notif-banner' + (isTakeaway ? ' tw' : '') + ' show';
+
+    // Auto dismiss after 6 seconds
+    clearTimeout(notifTimer);
+    notifTimer = setTimeout(dismissNotif, 6000);
+
+    // Switch to that tab automatically
+    switchTab(isTakeaway ? 'takeaway' : 'reservations');
+  }
+
+  function dismissNotif() {
+    const banner = document.getElementById('notifBanner');
+    banner.classList.remove('show');
+  }
+
+  function playChime() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const notes = [523, 659, 784]; // C, E, G — pleasant chime
+      notes.forEach((freq, i) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.18, ctx.currentTime + i * 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.6);
+        osc.start(ctx.currentTime + i * 0.15);
+        osc.stop(ctx.currentTime + i * 0.15 + 0.6);
+      });
+    } catch(e) { /* audio not available */ }
+  }
+
+  // Start realtime when dashboard becomes visible
+  const _origShowDashboard = showDashboard;
+  // Patch showDashboard to also start realtime
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = sessionStorage.getItem('coastaldine_admin');
+    if (saved && ADMIN_CREDENTIALS[saved] !== undefined) {
+      currentUser = saved;
+      showDashboard();
+      startRealtime();
+    }
+  });
+
+  // Also patch the login flow
+  const _origDoLogin = doLogin;
+  function doLoginPatched() {
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    const btn  = document.getElementById('loginBtn');
+    if (!user || !pass) { showLoginError('Please enter your username and password.'); return; }
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    setTimeout(() => {
+      if (ADMIN_CREDENTIALS[user] && ADMIN_CREDENTIALS[user] === pass) {
+        currentUser = user;
+        sessionStorage.setItem('coastaldine_admin', user);
+        showDashboard();
+        startRealtime();
+      } else {
+        showLoginError('Invalid username or password.');
+        btn.disabled = false; btn.textContent = 'Sign In →';
+      }
+    }, 600);
+  }
+  // Override doLogin
+  window.doLogin = doLoginPatched;
+
+  // Stop polling on logout
+  const _origDoLogout = doLogout;
+  function doLogoutPatched() {
+    stopRealtime();
+    sessionStorage.removeItem('coastaldine_admin');
+    currentUser = null;
+    allReservations = []; allTakeawayOrders = [];
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginError').style.display = 'none';
+    document.getElementById('dashboard').classList.remove('visible');
+    document.getElementById('loginScreen').style.display = 'flex';
+    showToast('Signed out successfully');
+  }
   // Spin animation for loader
   const style = document.createElement('style');
   style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
