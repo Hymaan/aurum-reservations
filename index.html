@@ -1312,6 +1312,65 @@
   }
   .admin-trigger:hover { color: var(--gold-dim); }
 
+  /* ─── STEP INDICATOR ─── */
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 1rem 0 1.25rem;
+  }
+  .step-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    transition: all 0.35s;
+    flex-shrink: 0;
+  }
+  .step-dot.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--dark);
+    font-weight: 600;
+  }
+  .step-dot.done {
+    background: rgba(201,168,76,0.2);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .step-line {
+    flex: 1;
+    height: 1px;
+    background: var(--divider);
+    margin: 0 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .step-line::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0%;
+    background: var(--gold);
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .step-line.filled::after { width: 100%; }
+
+  .modal-step-sub {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 200;
+    letter-spacing: 0.25em;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
   /* ─── DISH SELECTION ─── */
   .dish-section-title {
     font-family: 'Raleway', sans-serif;
@@ -1416,26 +1475,40 @@
 <!-- RESERVATION MODAL -->
 <div class="modal-overlay" id="reservationModal">
   <div class="modal">
+
+    <!-- ── STEP HEADER ── -->
     <div class="modal-header" id="modalFormHeader">
       <span class="modal-eyebrow">Aurum Fine Dining</span>
-      <h2 class="modal-title">Reserve a <em>Table</em></h2>
+      <div class="step-indicator">
+        <div class="step-dot active" id="stepDot1">
+          <span>1</span>
+        </div>
+        <div class="step-line" id="stepLine"></div>
+        <div class="step-dot" id="stepDot2">
+          <span>2</span>
+        </div>
+      </div>
+      <h2 class="modal-title" id="modalStepTitle">Your <em>Details</em></h2>
+      <p class="modal-step-sub" id="modalStepSub">Step 1 of 2 — Reservation info</p>
       <button class="modal-close" onclick="closeReservation()">✕</button>
     </div>
-    <div class="modal-body" id="modalFormBody">
+
+    <!-- ── STEP 1: DETAILS ── -->
+    <div class="modal-body" id="step1Body">
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">First Name</label>
-          <input class="form-input" id="f_first" type="text" placeholder="Jean">
+          <label class="form-label">First Name *</label>
+          <input class="form-input" id="f_first" type="text" placeholder="Your first name">
         </div>
         <div class="form-group">
-          <label class="form-label">Last Name</label>
-          <input class="form-input" id="f_last" type="text" placeholder="Dupont">
+          <label class="form-label">Last Name *</label>
+          <input class="form-input" id="f_last" type="text" placeholder="Your last name">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Email</label>
-          <input class="form-input" id="f_email" type="email" placeholder="jean@example.com">
+          <label class="form-label">Email *</label>
+          <input class="form-input" id="f_email" type="email" placeholder="you@example.com">
         </div>
         <div class="form-group">
           <label class="form-label">Phone</label>
@@ -1444,11 +1517,11 @@
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Date</label>
+          <label class="form-label">Date *</label>
           <input class="form-input" id="f_date" type="date">
         </div>
         <div class="form-group">
-          <label class="form-label">Time</label>
+          <label class="form-label">Time *</label>
           <select class="form-select" id="f_time">
             <option value="">Select time</option>
             <option>5:30 PM</option><option>6:00 PM</option><option>6:30 PM</option>
@@ -1459,9 +1532,9 @@
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Party Size</label>
+          <label class="form-label">Party Size *</label>
           <select class="form-select" id="f_guests">
-            <option value="">Guests</option>
+            <option value="">Select guests</option>
             <option>1 Guest</option><option>2 Guests</option><option>3 Guests</option>
             <option>4 Guests</option><option>5 Guests</option><option>6 Guests</option>
             <option>7 Guests</option><option>8+ Guests (call us)</option>
@@ -1476,15 +1549,19 @@
           </select>
         </div>
       </div>
+      <p class="form-note" id="step1Error" style="color:#e07060;display:none;margin-bottom:0.5rem;">Please fill in all required fields.</p>
+      <button class="form-submit" onclick="goToStep2()">
+        <span>Next — Choose Your Dishes →</span>
+      </button>
+    </div>
 
-      <!-- ─── DISH SELECTION ─── -->
-      <div style="margin:1.75rem 0 1rem;padding:1rem 1.25rem;background:rgba(201,168,76,0.06);border:1px solid var(--divider);display:flex;align-items:center;gap:0.75rem;">
-        <span style="color:var(--gold);font-size:1rem;">🍽</span>
-        <div>
-          <div style="font-family:'Raleway',sans-serif;font-size:0.65rem;font-weight:300;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);">Pre-Order Your Dishes</div>
-          <div style="font-family:'Raleway',sans-serif;font-size:0.7rem;font-weight:200;color:var(--text-muted);margin-top:0.2rem;">Select what you'd like — optional but helps us prepare</div>
-        </div>
-      </div>
+    <!-- ── STEP 2: DISHES ── -->
+    <div class="modal-body" id="step2Body" style="display:none;">
+
+      <!-- Back button -->
+      <button onclick="goToStep1()" style="background:none;border:none;color:var(--gold-dim);font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:300;letter-spacing:0.2em;cursor:pointer;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.4rem;padding:0;text-transform:uppercase;">
+        ← Back to Details
+      </button>
 
       <div class="dish-section-title">🍗 Chicken Starters</div>
       <div class="dish-grid">
@@ -1545,21 +1622,23 @@
         <div class="dish-chip" onclick="toggleDish(this,'Soft Drinks')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Soft Drinks</span></div>
       </div>
 
-      <!-- Selection summary -->
       <div class="dish-summary" id="dishSummary"></div>
 
-      <div class="form-row single" style="margin-top:1.25rem;">
+      <div class="form-row single" style="margin-top:1.5rem;">
         <div class="form-group">
           <label class="form-label">Special Requests</label>
           <textarea class="form-textarea" id="f_notes" placeholder="Dietary requirements, allergies, special arrangements..."></textarea>
         </div>
       </div>
+
       <button class="form-submit" id="submitBtn" onclick="submitReservation()">
-        <span id="submitBtnText">Confirm Reservation</span>
+        <span id="submitBtnText">Confirm Reservation ✦</span>
       </button>
-      <p class="form-note" id="formError" style="color:#e07060;display:none;">Please fill in all required fields.</p>
+      <p class="form-note" id="formError" style="color:#e07060;display:none;">Something went wrong. Please try again.</p>
       <p class="form-note">We will confirm your reservation within 2 hours by email.</p>
     </div>
+
+    <!-- ── SUCCESS ── -->
     <div class="modal-success" id="modalSuccess">
       <div class="success-icon">✦</div>
       <div class="success-title">Reservation <em>Confirmed</em></div>
@@ -1568,6 +1647,7 @@
       <div class="success-ref" id="successRef">—</div>
       <button class="btn-gold" onclick="closeReservation()" style="border:none;margin-top:1.5rem;"><span>Close</span></button>
     </div>
+
   </div>
 </div>
 
@@ -2183,19 +2263,62 @@
   });
 
   function resetForm() {
+    // Show header, hide success
     document.getElementById('modalFormHeader').style.display = '';
-    document.getElementById('modalFormBody').style.display = '';
     document.getElementById('modalSuccess').classList.remove('show');
-    document.getElementById('formError').style.display = 'none';
-    document.getElementById('formError').textContent = 'Please fill in all required fields.';
     document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtnText').textContent = 'Confirm Reservation';
+    document.getElementById('submitBtnText').textContent = 'Confirm Reservation ✦';
+    document.getElementById('formError').style.display = 'none';
+    document.getElementById('step1Error').style.display = 'none';
+    // Reset to step 1
+    goToStep1(true);
+    // Clear fields
     ['f_first','f_last','f_email','f_phone','f_date','f_time','f_guests','f_occasion','f_notes']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
     // Reset dish chips
     document.querySelectorAll('.dish-chip').forEach(c => c.classList.remove('selected'));
-    document.getElementById('dishSummary').classList.remove('visible');
-    document.getElementById('dishSummary').innerHTML = '';
+    const ds = document.getElementById('dishSummary');
+    if (ds) { ds.classList.remove('visible'); ds.innerHTML = ''; }
+  }
+
+  // ─── STEP NAVIGATION ─────────────────────────────────────────
+  function goToStep1(silent) {
+    document.getElementById('step1Body').style.display = '';
+    document.getElementById('step2Body').style.display = 'none';
+    // Step indicators
+    document.getElementById('stepDot1').classList.add('active');
+    document.getElementById('stepDot1').classList.remove('done');
+    document.getElementById('stepDot2').classList.remove('active','done');
+    document.getElementById('stepLine').classList.remove('filled');
+    document.getElementById('modalStepTitle').innerHTML = 'Your <em>Details</em>';
+    document.getElementById('modalStepSub').textContent = 'Step 1 of 2 — Reservation info';
+    // Scroll top
+    document.querySelector('.modal').scrollTop = 0;
+  }
+
+  function goToStep2() {
+    // Validate step 1
+    const first  = document.getElementById('f_first').value.trim();
+    const last   = document.getElementById('f_last').value.trim();
+    const email  = document.getElementById('f_email').value.trim();
+    const date   = document.getElementById('f_date').value;
+    const time   = document.getElementById('f_time').value;
+    const guests = document.getElementById('f_guests').value;
+    if (!first || !last || !email || !date || !time || !guests) {
+      document.getElementById('step1Error').style.display = 'block';
+      return;
+    }
+    document.getElementById('step1Error').style.display = 'none';
+    document.getElementById('step1Body').style.display = 'none';
+    document.getElementById('step2Body').style.display = '';
+    // Step indicators
+    document.getElementById('stepDot1').classList.remove('active');
+    document.getElementById('stepDot1').classList.add('done');
+    document.getElementById('stepDot2').classList.add('active');
+    document.getElementById('stepLine').classList.add('filled');
+    document.getElementById('modalStepTitle').innerHTML = 'Choose Your <em>Dishes</em>';
+    document.getElementById('modalStepSub').textContent = 'Step 2 of 2 — Pre-order (optional)';
+    document.querySelector('.modal').scrollTop = 0;
   }
 
   // ─── DISH SELECTION ───────────────────────────────────────────
@@ -2277,7 +2400,8 @@
       }
 
       document.getElementById('modalFormHeader').style.display = 'none';
-      document.getElementById('modalFormBody').style.display = 'none';
+      document.getElementById('step1Body').style.display = 'none';
+      document.getElementById('step2Body').style.display = 'none';
       document.getElementById('successRef').textContent = ref;
       // Show selected dishes on success
       const dishes = getSelectedDishes();
