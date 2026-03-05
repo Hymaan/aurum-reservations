@@ -676,8 +676,13 @@
     0%   { background: rgba(106,191,122,0.25); }
     100% { background: transparent; }
   }
-  .row-new td { animation: rowFlash 2.5s ease-out forwards; }
-  .row-new-tw td { animation: twRowFlash 2.5s ease-out forwards; }
+  @keyframes dineRowFlash {
+    0%   { background: rgba(126,200,227,0.25); }
+    100% { background: transparent; }
+  }
+  .row-new td      { animation: rowFlash 2.5s ease-out forwards; }
+  .row-new-tw td   { animation: twRowFlash 2.5s ease-out forwards; }
+  .row-new-dine td { animation: dineRowFlash 2.5s ease-out forwards; }
 
   .live-badge {
     display: inline-flex;
@@ -718,12 +723,14 @@
     transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
     white-space: nowrap;
   }
-  .notif-banner.tw { border-color: var(--green); }
+  .notif-banner.tw   { border-color: var(--green); }
+  .notif-banner.dine { border-color: #7ec8e3; }
   .notif-banner.show { transform: translateX(-50%) translateY(0); }
   .notif-icon { font-size: 1.2rem; }
   .notif-text { font-family: 'Raleway', sans-serif; font-size: 0.75rem; font-weight: 300; color: var(--cream); }
   .notif-text strong { color: var(--gold); font-weight: 400; }
-  .notif-banner.tw .notif-text strong { color: #6abf7a; }
+  .notif-banner.tw   .notif-text strong { color: #6abf7a; }
+  .notif-banner.dine .notif-text strong { color: #7ec8e3; }
   .notif-dismiss {
     background: none; border: none; color: var(--text-muted);
     cursor: pointer; font-size: 0.9rem; line-height: 1;
@@ -1837,87 +1844,73 @@
 
   async function pollForUpdates() {
     try {
-      const [resRes, twRes] = await Promise.all([
-        fetch(SUPABASE_URL + '/rest/v1/reservations?select=*&order=created_at.desc&limit=1000', { headers: SB_HEADERS }),
-        fetch(SUPABASE_URL + '/rest/v1/takeaway_orders?select=*&order=created_at.desc&limit=1000', { headers: SB_HEADERS })
+      const [resRes, twRes, dineRes] = await Promise.all([
+        fetch(SUPABASE_URL + '/rest/v1/reservations?select=*&order=created_at.desc&limit=1000',    { headers: SB_HEADERS }),
+        fetch(SUPABASE_URL + '/rest/v1/takeaway_orders?select=*&order=created_at.desc&limit=1000', { headers: SB_HEADERS }),
+        fetch(SUPABASE_URL + '/rest/v1/table_orders?select=*&order=created_at.desc&limit=1000',    { headers: SB_HEADERS })
       ]);
 
-      const newReservations = resRes.ok ? await resRes.json() : allReservations;
-      const newTakeaways    = twRes.ok  ? await twRes.json()  : allTakeawayOrders;
+      const newReservations = resRes.ok  ? await resRes.json()  : allReservations;
+      const newTakeaways    = twRes.ok   ? await twRes.json()   : allTakeawayOrders;
+      const newDining       = dineRes.ok ? await dineRes.json() : allDiningOrders;
 
-      // Check for new reservations
-      const newResIds = newReservations.map(r => r.id);
-      const oldResIds = allReservations.map(r => r.id);
-      const addedRes  = newReservations.filter(r => !oldResIds.includes(r.id));
+      const addedRes  = newReservations.filter(r => !allReservations.map(x=>x.id).includes(r.id));
+      const addedTw   = newTakeaways.filter(r => !allTakeawayOrders.map(x=>x.id).includes(r.id));
+      const addedDine = newDining.filter(r => !allDiningOrders.map(x=>x.id).includes(r.id));
 
-      // Check for new takeaway orders
-      const newTwIds  = newTakeaways.map(r => r.id);
-      const oldTwIds  = allTakeawayOrders.map(r => r.id);
-      const addedTw   = newTakeaways.filter(r => !oldTwIds.includes(r.id));
+      allReservations   = newReservations;
+      allTakeawayOrders = newTakeaways;
+      allDiningOrders   = newDining;
+      updateStats();
 
-      if (addedRes.length > 0 || addedTw.length > 0) {
-        allReservations   = newReservations;
-        allTakeawayOrders = newTakeaways;
-        updateStats();
-
-        if (addedRes.length > 0) {
-          const r = addedRes[0];
-          renderTable();
-          flashNewRow(r.id, false);
-          showNotif(
-            false,
-            `New reservation — <strong>${escHtml(r.first)} ${escHtml(r.last)}</strong> · ${escHtml(r.date||'')} at ${escHtml(r.time||'')}`
-          );
-          playChime();
-        }
-
-        if (addedTw.length > 0) {
-          const r = addedTw[0];
-          renderTakeaway();
-          flashNewRow(r.id, true);
-          showNotif(
-            true,
-            `New takeaway order — <strong>${escHtml(r.first)} ${escHtml(r.last)}</strong> · Pickup ${escHtml(r.pickup_date||'')} ${escHtml(r.pickup_time||'')}`
-          );
-          playChime();
-        }
-      } else {
-        // Silently sync in case of deletions
-        allReservations   = newReservations;
-        allTakeawayOrders = newTakeaways;
-        updateStats();
+      if (addedRes.length > 0) {
+        const r = addedRes[0];
+        renderTable();
+        flashNewRow('tableWrap');
+        showNotif('res', `New reservation — <strong>${escHtml(r.first)} ${escHtml(r.last)}</strong> · ${escHtml(r.date||'')} at ${escHtml(r.time||'')}`);
+        playChime();
+      }
+      if (addedTw.length > 0) {
+        const r = addedTw[0];
+        renderTakeaway();
+        flashNewRow('twTableWrap');
+        showNotif('tw', `New takeaway — <strong>${escHtml(r.first)} ${escHtml(r.last)}</strong> · Pickup ${escHtml(r.pickup_date||'')} ${escHtml(r.pickup_time||'')}`);
+        playChime();
+      }
+      if (addedDine.length > 0) {
+        const r = addedDine[0];
+        renderDining();
+        flashNewRow('diningTableWrap');
+        showNotif('dine', `New dining order — <strong>${escHtml(r.table_number||'')}</strong> · ${escHtml(r.phone||'')} · ${escHtml(r.items||'').split(',')[0]}`);
+        playChime();
       }
 
-    } catch(e) {
-      // Silently fail — don't disrupt admin
-    }
+    } catch(e) { /* silently fail */ }
   }
 
-  function flashNewRow(id, isTakeaway) {
+  function flashNewRow(wrapId) {
     setTimeout(() => {
-      const table  = isTakeaway ? document.querySelector('#twTableWrap table') : document.querySelector('#tableWrap table');
+      const table = document.querySelector('#' + wrapId + ' table');
       if (!table) return;
       const rows = table.querySelectorAll('tbody tr');
-      // First row is always the newest (ordered by created_at desc)
       if (rows[0]) {
-        rows[0].classList.add(isTakeaway ? 'row-new-tw' : 'row-new');
-        setTimeout(() => rows[0].classList.remove(isTakeaway ? 'row-new-tw' : 'row-new'), 3000);
+        const cls = wrapId === 'twTableWrap' ? 'row-new-tw' : wrapId === 'diningTableWrap' ? 'row-new-dine' : 'row-new';
+        rows[0].classList.add(cls);
+        setTimeout(() => rows[0].classList.remove(cls), 3000);
       }
     }, 200);
   }
 
-  function showNotif(isTakeaway, html) {
+  function showNotif(type, html) {
     const banner = document.getElementById('notifBanner');
-    document.getElementById('notifIcon').textContent  = isTakeaway ? '🛍' : '🍽';
-    document.getElementById('notifText').innerHTML    = html;
-    banner.className = 'notif-banner' + (isTakeaway ? ' tw' : '') + ' show';
-
-    // Auto dismiss after 6 seconds
+    const icons  = { res:'🍽', tw:'🛍', dine:'🪑' };
+    const tabs   = { res:'reservations', tw:'takeaway', dine:'dining' };
+    document.getElementById('notifIcon').textContent = icons[type] || '🍽';
+    document.getElementById('notifText').innerHTML   = html;
+    banner.className = 'notif-banner' + (type==='tw' ? ' tw' : type==='dine' ? ' dine' : '') + ' show';
     clearTimeout(notifTimer);
     notifTimer = setTimeout(dismissNotif, 6000);
-
-    // Switch to that tab automatically
-    switchTab(isTakeaway ? 'takeaway' : 'reservations');
+    switchTab(tabs[type] || 'reservations');
   }
 
   function dismissNotif() {
