@@ -207,7 +207,7 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 100;
-    padding: 1.5rem 3rem;
+    padding: 1.25rem 3rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -222,6 +222,7 @@
     color: var(--gold);
     letter-spacing: 0.15em;
     text-decoration: none;
+    flex-shrink: 0;
   }
 
   .nav-links {
@@ -243,23 +244,67 @@
 
   .nav-links a:hover { color: var(--gold); }
 
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+  }
+
   .nav-reserve {
     font-family: 'Raleway', sans-serif;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 300;
-    letter-spacing: 0.3em;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--gold);
     border: 1px solid var(--gold-dim);
-    padding: 0.6rem 1.5rem;
+    padding: 0.55rem 1.25rem;
     text-decoration: none;
     transition: all 0.3s;
+    white-space: nowrap;
   }
+  .nav-reserve:hover { background: var(--gold); color: var(--dark); }
 
-  .nav-reserve:hover {
-    background: var(--gold);
-    color: var(--dark);
+  .nav-btn-takeaway {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 0.55rem 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+    text-decoration: none;
   }
+  .nav-btn-takeaway:hover { background: rgba(201,168,76,0.18); border-color: var(--gold-dim); color: var(--gold); }
+
+  .nav-btn-dine {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 0.55rem 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .nav-btn-dine:hover { border-color: rgba(126,200,227,0.35); color: #7ec8e3; background: rgba(126,200,227,0.06); }
 
   /* ─── SECTION LAYOUT ─── */
   .section {
@@ -906,6 +951,7 @@
   @media (max-width: 900px) {
     nav { padding: 1.2rem 1.5rem; }
     .nav-links { display: none; }
+    .nav-btn-dine { display: none; }
     .featured-inner { grid-template-columns: 1fr; }
     .featured-visual { min-height: 300px; }
     .wine-grid { grid-template-columns: 1fr; }
@@ -918,6 +964,8 @@
     .footer-inner { grid-template-columns: 1fr; }
     .menu-tabs { gap: 0; }
     .tab-btn { padding: 0.75rem 1rem; font-size: 0.6rem; }
+    .nav-btn-takeaway span, .nav-reserve { font-size: 0.55rem; padding: 0.5rem 0.9rem; }
+    .nav-actions { gap: 0.4rem; }
   }
 
   /* ─── RESERVATION MODAL ─── */
@@ -1815,70 +1863,74 @@
     <div class="modal-body" id="step2Body" style="display:none;">
 
       <!-- Back button -->
-      <button onclick="goToStep1()" style="background:none;border:none;color:var(--gold-dim);font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:300;letter-spacing:0.2em;cursor:pointer;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.4rem;padding:0;text-transform:uppercase;">
+      <button onclick="goToStep1()" style="background:none;border:none;color:var(--gold-dim);font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:300;letter-spacing:0.2em;cursor:pointer;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.4rem;padding:0;text-transform:uppercase;">
         ← Back to Details
       </button>
 
+      <!-- Cart summary bar -->
+      <div class="tw-cart-bar" style="margin-bottom:1.25rem;">
+        <span id="resDishLabel">Select dishes to pre-order (optional)</span>
+        <div class="tw-cart-count" id="resDishCount">0</div>
+      </div>
+
       <div class="dish-section-title">🍗 Chicken Starters</div>
       <div class="dish-grid">
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Popcorn')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Popcorn</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Lollipop')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Lollipop</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken 65')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken 65</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Wings')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Wings</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Pakora')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Pakora</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Strips')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Strips</span></div>
+        <div class="tw-dish-chip" id="resc-Chicken Popcorn"><span class="tw-dish-chip-name">Chicken Popcorn</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Popcorn',-1)">−</button><span class="qty-num" id="resq-Chicken Popcorn">0</span><button class="qty-btn" onclick="resQty('Chicken Popcorn',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Chicken Lollipop"><span class="tw-dish-chip-name">Chicken Lollipop</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Lollipop',-1)">−</button><span class="qty-num" id="resq-Chicken Lollipop">0</span><button class="qty-btn" onclick="resQty('Chicken Lollipop',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Chicken 65"><span class="tw-dish-chip-name">Chicken 65</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken 65',-1)">−</button><span class="qty-num" id="resq-Chicken 65">0</span><button class="qty-btn" onclick="resQty('Chicken 65',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Chicken Wings"><span class="tw-dish-chip-name">Chicken Wings</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Wings',-1)">−</button><span class="qty-num" id="resq-Chicken Wings">0</span><button class="qty-btn" onclick="resQty('Chicken Wings',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Chicken Pakora"><span class="tw-dish-chip-name">Chicken Pakora</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Pakora',-1)">−</button><span class="qty-num" id="resq-Chicken Pakora">0</span><button class="qty-btn" onclick="resQty('Chicken Pakora',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Chicken Strips"><span class="tw-dish-chip-name">Chicken Strips</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Strips',-1)">−</button><span class="qty-num" id="resq-Chicken Strips">0</span><button class="qty-btn" onclick="resQty('Chicken Strips',1)">+</button></div></div>
       </div>
 
       <div class="dish-section-title">🍛 Meals & Combos</div>
       <div class="dish-grid">
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Biryani Combo')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Biryani Combo</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Mutton Biryani Combo')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mutton Biryani Combo</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Ghee Rice Combo')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Ghee Rice Combo</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Boiled Rice with Curry')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Boiled Rice with Curry</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Thali')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Thali</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Mutton Thali')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mutton Thali</span></div>
+        <div class="tw-dish-chip" id="resc-Chicken Biryani Combo"><span class="tw-dish-chip-name">Chicken Biryani Combo</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Biryani Combo',-1)">−</button><span class="qty-num" id="resq-Chicken Biryani Combo">0</span><button class="qty-btn" onclick="resQty('Chicken Biryani Combo',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Mutton Biryani Combo"><span class="tw-dish-chip-name">Mutton Biryani Combo</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Mutton Biryani Combo',-1)">−</button><span class="qty-num" id="resq-Mutton Biryani Combo">0</span><button class="qty-btn" onclick="resQty('Mutton Biryani Combo',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Ghee Rice Combo"><span class="tw-dish-chip-name">Ghee Rice Combo</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Ghee Rice Combo',-1)">−</button><span class="qty-num" id="resq-Ghee Rice Combo">0</span><button class="qty-btn" onclick="resQty('Ghee Rice Combo',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Boiled Rice with Curry"><span class="tw-dish-chip-name">Boiled Rice with Curry</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Boiled Rice with Curry',-1)">−</button><span class="qty-num" id="resq-Boiled Rice with Curry">0</span><button class="qty-btn" onclick="resQty('Boiled Rice with Curry',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Chicken Thali"><span class="tw-dish-chip-name">Chicken Thali</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Thali',-1)">−</button><span class="qty-num" id="resq-Chicken Thali">0</span><button class="qty-btn" onclick="resQty('Chicken Thali',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Mutton Thali"><span class="tw-dish-chip-name">Mutton Thali</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Mutton Thali',-1)">−</button><span class="qty-num" id="resq-Mutton Thali">0</span><button class="qty-btn" onclick="resQty('Mutton Thali',1)">+</button></div></div>
       </div>
 
       <div class="dish-section-title">🫓 Dinner Specials</div>
       <div class="dish-grid">
-        <div class="dish-chip" onclick="toggleDish(this,'Kerala Parota')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Kerala Parota</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Chapathi')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chapathi</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Rice Pathiri')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Rice Pathiri</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Idiyappam')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Idiyappam</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Plain Dosa')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Plain Dosa</span></div>
+        <div class="tw-dish-chip" id="resc-Kerala Parota"><span class="tw-dish-chip-name">Kerala Parota</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Kerala Parota',-1)">−</button><span class="qty-num" id="resq-Kerala Parota">0</span><button class="qty-btn" onclick="resQty('Kerala Parota',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Chapathi"><span class="tw-dish-chip-name">Chapathi</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chapathi',-1)">−</button><span class="qty-num" id="resq-Chapathi">0</span><button class="qty-btn" onclick="resQty('Chapathi',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Rice Pathiri"><span class="tw-dish-chip-name">Rice Pathiri</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Rice Pathiri',-1)">−</button><span class="qty-num" id="resq-Rice Pathiri">0</span><button class="qty-btn" onclick="resQty('Rice Pathiri',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Idiyappam"><span class="tw-dish-chip-name">Idiyappam</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Idiyappam',-1)">−</button><span class="qty-num" id="resq-Idiyappam">0</span><button class="qty-btn" onclick="resQty('Idiyappam',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Plain Dosa"><span class="tw-dish-chip-name">Plain Dosa</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Plain Dosa',-1)">−</button><span class="qty-num" id="resq-Plain Dosa">0</span><button class="qty-btn" onclick="resQty('Plain Dosa',1)">+</button></div></div>
       </div>
 
       <div class="dish-section-title">🥘 Curries</div>
       <div class="dish-grid">
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Ghee Roast')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Ghee Roast</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Sukka')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Sukka</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Mutton Rogan Josh')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mutton Rogan Josh</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Beef Fry')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Beef Fry</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Chicken Curry')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Chicken Curry</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Mutton Stew')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mutton Stew</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Beef Masala')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Beef Masala</span></div>
+        <div class="tw-dish-chip" id="resc-Chicken Ghee Roast"><span class="tw-dish-chip-name">Chicken Ghee Roast</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Ghee Roast',-1)">−</button><span class="qty-num" id="resq-Chicken Ghee Roast">0</span><button class="qty-btn" onclick="resQty('Chicken Ghee Roast',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Chicken Sukka"><span class="tw-dish-chip-name">Chicken Sukka</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Sukka',-1)">−</button><span class="qty-num" id="resq-Chicken Sukka">0</span><button class="qty-btn" onclick="resQty('Chicken Sukka',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Mutton Rogan Josh"><span class="tw-dish-chip-name">Mutton Rogan Josh</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Mutton Rogan Josh',-1)">−</button><span class="qty-num" id="resq-Mutton Rogan Josh">0</span><button class="qty-btn" onclick="resQty('Mutton Rogan Josh',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Beef Fry"><span class="tw-dish-chip-name">Beef Fry</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Beef Fry',-1)">−</button><span class="qty-num" id="resq-Beef Fry">0</span><button class="qty-btn" onclick="resQty('Beef Fry',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Chicken Curry"><span class="tw-dish-chip-name">Chicken Curry</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Chicken Curry',-1)">−</button><span class="qty-num" id="resq-Chicken Curry">0</span><button class="qty-btn" onclick="resQty('Chicken Curry',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Mutton Stew"><span class="tw-dish-chip-name">Mutton Stew</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Mutton Stew',-1)">−</button><span class="qty-num" id="resq-Mutton Stew">0</span><button class="qty-btn" onclick="resQty('Mutton Stew',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Beef Masala"><span class="tw-dish-chip-name">Beef Masala</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Beef Masala',-1)">−</button><span class="qty-num" id="resq-Beef Masala">0</span><button class="qty-btn" onclick="resQty('Beef Masala',1)">+</button></div></div>
       </div>
 
       <div class="dish-section-title">🍨 Desserts</div>
       <div class="dish-grid">
-        <div class="dish-chip" onclick="toggleDish(this,'Gadbad Ice Cream')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Gadbad Ice Cream</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Caramel Custard')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Caramel Custard</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Gulab Jamun')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Gulab Jamun</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Kesari Bath')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Kesari Bath</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Payasam')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Payasam</span></div>
+        <div class="tw-dish-chip" id="resc-Gadbad Ice Cream"><span class="tw-dish-chip-name">Gadbad Ice Cream</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Gadbad Ice Cream',-1)">−</button><span class="qty-num" id="resq-Gadbad Ice Cream">0</span><button class="qty-btn" onclick="resQty('Gadbad Ice Cream',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Caramel Custard"><span class="tw-dish-chip-name">Caramel Custard</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Caramel Custard',-1)">−</button><span class="qty-num" id="resq-Caramel Custard">0</span><button class="qty-btn" onclick="resQty('Caramel Custard',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Gulab Jamun"><span class="tw-dish-chip-name">Gulab Jamun</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Gulab Jamun',-1)">−</button><span class="qty-num" id="resq-Gulab Jamun">0</span><button class="qty-btn" onclick="resQty('Gulab Jamun',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Kesari Bath"><span class="tw-dish-chip-name">Kesari Bath</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Kesari Bath',-1)">−</button><span class="qty-num" id="resq-Kesari Bath">0</span><button class="qty-btn" onclick="resQty('Kesari Bath',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Payasam"><span class="tw-dish-chip-name">Payasam</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Payasam',-1)">−</button><span class="qty-num" id="resq-Payasam">0</span><button class="qty-btn" onclick="resQty('Payasam',1)">+</button></div></div>
       </div>
 
       <div class="dish-section-title">🥤 Drinks</div>
       <div class="dish-grid">
-        <div class="dish-chip" onclick="toggleDish(this,'Fresh Lime Soda')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Fresh Lime Soda</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Mango Lassi')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Mango Lassi</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Buttermilk')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Buttermilk</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Cold Coffee')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Cold Coffee</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Falooda')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Falooda</span></div>
-        <div class="dish-chip" onclick="toggleDish(this,'Soft Drinks')"><span class="dish-chip-check">✓</span><span class="dish-chip-name">Soft Drinks</span></div>
+        <div class="tw-dish-chip" id="resc-Fresh Lime Soda"><span class="tw-dish-chip-name">Fresh Lime Soda</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Fresh Lime Soda',-1)">−</button><span class="qty-num" id="resq-Fresh Lime Soda">0</span><button class="qty-btn" onclick="resQty('Fresh Lime Soda',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Mango Lassi"><span class="tw-dish-chip-name">Mango Lassi</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Mango Lassi',-1)">−</button><span class="qty-num" id="resq-Mango Lassi">0</span><button class="qty-btn" onclick="resQty('Mango Lassi',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Buttermilk"><span class="tw-dish-chip-name">Buttermilk</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Buttermilk',-1)">−</button><span class="qty-num" id="resq-Buttermilk">0</span><button class="qty-btn" onclick="resQty('Buttermilk',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Cold Coffee"><span class="tw-dish-chip-name">Cold Coffee</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Cold Coffee',-1)">−</button><span class="qty-num" id="resq-Cold Coffee">0</span><button class="qty-btn" onclick="resQty('Cold Coffee',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Falooda"><span class="tw-dish-chip-name">Falooda</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Falooda',-1)">−</button><span class="qty-num" id="resq-Falooda">0</span><button class="qty-btn" onclick="resQty('Falooda',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="resc-Soft Drinks"><span class="tw-dish-chip-name">Soft Drinks</span><div class="qty-ctrl"><button class="qty-btn" onclick="resQty('Soft Drinks',-1)">−</button><span class="qty-num" id="resq-Soft Drinks">0</span><button class="qty-btn" onclick="resQty('Soft Drinks',1)">+</button></div></div>
       </div>
-
-      <div class="dish-summary" id="dishSummary"></div>
 
       <div class="form-row single" style="margin-top:1.5rem;">
         <div class="form-group">
@@ -1937,7 +1989,11 @@
     <li><a href="#wine">Wine</a></li>
     <li><a href="#about">About</a></li>
   </ul>
-  <a href="#" class="nav-reserve" onclick="openReservation(event)">Reserve a Table</a>
+  <div class="nav-actions">
+    <a href="#" class="nav-btn-dine" onclick="openTableOrder();return false;">🪑 Order at Table</a>
+    <a href="#" class="nav-btn-takeaway" onclick="openTakeaway();return false;">🛍 Takeaway</a>
+    <a href="#" class="nav-reserve" onclick="openReservation(event)">Reserve a Table</a>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -2527,10 +2583,16 @@
     // Clear fields
     ['f_first','f_last','f_email','f_phone','f_date','f_time','f_guests','f_occasion','f_notes']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-    // Reset dish chips
-    document.querySelectorAll('.dish-chip').forEach(c => c.classList.remove('selected'));
-    const ds = document.getElementById('dishSummary');
-    if (ds) { ds.classList.remove('visible'); ds.innerHTML = ''; }
+    // Reset dish quantities in reservation form
+    Object.keys(resCart).forEach(k => {
+      resCart[k] = 0;
+      const qEl = document.getElementById('resq-' + k);
+      const cEl = document.getElementById('resc-' + k);
+      if (qEl) qEl.textContent = '0';
+      if (cEl) cEl.classList.remove('in-cart');
+    });
+    document.getElementById('resDishCount').textContent = '0';
+    document.getElementById('resDishLabel').textContent = 'Select dishes to pre-order (optional)';
   }
 
   // ─── STEP NAVIGATION ─────────────────────────────────────────
@@ -2580,20 +2642,13 @@
   }
 
   function getSelectedDishes() {
-    return Array.from(document.querySelectorAll('.dish-chip.selected'))
-      .map(c => c.querySelector('.dish-chip-name').textContent.trim());
+    // Now returns quantity-aware strings like "2x Chicken 65"
+    return Object.entries(resCart).filter(([,v])=>v>0).map(([d,q])=>`${q}x ${d}`);
   }
 
   function updateDishSummary() {
-    const dishes = getSelectedDishes();
-    const summary = document.getElementById('dishSummary');
-    if (dishes.length === 0) {
-      summary.classList.remove('visible');
-      summary.innerHTML = '';
-    } else {
-      summary.classList.add('visible');
-      summary.innerHTML = '<strong>' + dishes.length + ' dish' + (dishes.length > 1 ? 'es' : '') + ' selected:</strong> ' + dishes.join(', ');
-    }
+    // No-op — summary handled by resQty cart bar
+  }
   }
 
   // ─── SUPABASE CONFIG ──────────────────────────────────────────
@@ -2831,14 +2886,6 @@
     if (e.key === 'Escape') { closeReservation(); closeAdmin(); closeTakeaway(); }
   });
 </script>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- FLOATING TAKEAWAY BUTTON                            -->
-<!-- ═══════════════════════════════════════════════════ -->
-<button class="takeaway-fab" onclick="openTakeaway()">
-  <div class="takeaway-fab-inner">🛍</div>
-  <span class="takeaway-fab-label">Takeaway</span>
-</button>
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- TAKEAWAY MODAL                                      -->
@@ -3171,6 +3218,195 @@
       document.getElementById('twStep3Error').style.display = 'block';
       btn.disabled = false;
       document.getElementById('twSubmitText').textContent = 'Place Takeaway Order ✦';
+    }
+  }
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ORDER FROM TABLE MODAL                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="tw-overlay" id="tableOrderOverlay" onclick="if(event.target===this)closeTableOrder()">
+  <div class="tw-modal">
+    <div class="tw-header">
+      <div class="tw-header-left">
+        <span class="tw-eyebrow">Coastal Dine · Dine In</span>
+        <div class="tw-title">Order from <em>Your Table</em></div>
+      </div>
+      <button class="tw-close" onclick="closeTableOrder()">✕</button>
+    </div>
+
+    <div class="tw-body" id="toFormBody">
+      <div class="form-row" style="margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label">Table Number *</label>
+          <select class="form-select" id="to_table">
+            <option value="">Select table</option>
+            <option>Table 1</option><option>Table 2</option><option>Table 3</option><option>Table 4</option><option>Table 5</option>
+            <option>Table 6</option><option>Table 7</option><option>Table 8</option><option>Table 9</option><option>Table 10</option>
+            <option>Table 11</option><option>Table 12</option><option>Table 13</option><option>Table 14</option><option>Table 15</option>
+            <option>Table 16</option><option>Table 17</option><option>Table 18</option><option>Table 19</option><option>Table 20</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mobile Number *</label>
+          <input class="form-input" id="to_phone" type="tel" placeholder="+966 5X XXX XXXX">
+        </div>
+      </div>
+      <p class="form-note" id="toInfoError" style="color:#e07060;display:none;margin-bottom:0.75rem;">Please fill in table number and mobile number.</p>
+
+      <div class="tw-cart-bar">
+        <span id="toCartLabel">Select your dishes</span>
+        <div class="tw-cart-count" id="toCartCount">0</div>
+      </div>
+
+      <div class="dish-section-title">🍗 Chicken Starters</div>
+      <div class="dish-grid">
+        <div class="tw-dish-chip" id="toc-Chicken Popcorn"><span class="tw-dish-chip-name">Chicken Popcorn</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Popcorn',-1)">−</button><span class="qty-num" id="toq-Chicken Popcorn">0</span><button class="qty-btn" onclick="toQty('Chicken Popcorn',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Chicken Lollipop"><span class="tw-dish-chip-name">Chicken Lollipop</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Lollipop',-1)">−</button><span class="qty-num" id="toq-Chicken Lollipop">0</span><button class="qty-btn" onclick="toQty('Chicken Lollipop',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Chicken 65"><span class="tw-dish-chip-name">Chicken 65</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken 65',-1)">−</button><span class="qty-num" id="toq-Chicken 65">0</span><button class="qty-btn" onclick="toQty('Chicken 65',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Chicken Wings"><span class="tw-dish-chip-name">Chicken Wings</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Wings',-1)">−</button><span class="qty-num" id="toq-Chicken Wings">0</span><button class="qty-btn" onclick="toQty('Chicken Wings',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Chicken Pakora"><span class="tw-dish-chip-name">Chicken Pakora</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Pakora',-1)">−</button><span class="qty-num" id="toq-Chicken Pakora">0</span><button class="qty-btn" onclick="toQty('Chicken Pakora',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Chicken Strips"><span class="tw-dish-chip-name">Chicken Strips</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Strips',-1)">−</button><span class="qty-num" id="toq-Chicken Strips">0</span><button class="qty-btn" onclick="toQty('Chicken Strips',1)">+</button></div></div>
+      </div>
+      <div class="dish-section-title">🍛 Meals & Combos</div>
+      <div class="dish-grid">
+        <div class="tw-dish-chip" id="toc-Chicken Biryani Combo"><span class="tw-dish-chip-name">Chicken Biryani</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Biryani Combo',-1)">−</button><span class="qty-num" id="toq-Chicken Biryani Combo">0</span><button class="qty-btn" onclick="toQty('Chicken Biryani Combo',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Mutton Biryani Combo"><span class="tw-dish-chip-name">Mutton Biryani</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Mutton Biryani Combo',-1)">−</button><span class="qty-num" id="toq-Mutton Biryani Combo">0</span><button class="qty-btn" onclick="toQty('Mutton Biryani Combo',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Ghee Rice Combo"><span class="tw-dish-chip-name">Ghee Rice Combo</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Ghee Rice Combo',-1)">−</button><span class="qty-num" id="toq-Ghee Rice Combo">0</span><button class="qty-btn" onclick="toQty('Ghee Rice Combo',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Chicken Thali"><span class="tw-dish-chip-name">Chicken Thali</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Thali',-1)">−</button><span class="qty-num" id="toq-Chicken Thali">0</span><button class="qty-btn" onclick="toQty('Chicken Thali',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Mutton Thali"><span class="tw-dish-chip-name">Mutton Thali</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Mutton Thali',-1)">−</button><span class="qty-num" id="toq-Mutton Thali">0</span><button class="qty-btn" onclick="toQty('Mutton Thali',1)">+</button></div></div>
+      </div>
+      <div class="dish-section-title">🫓 Dinner Specials</div>
+      <div class="dish-grid">
+        <div class="tw-dish-chip" id="toc-Kerala Parota"><span class="tw-dish-chip-name">Kerala Parota</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Kerala Parota',-1)">−</button><span class="qty-num" id="toq-Kerala Parota">0</span><button class="qty-btn" onclick="toQty('Kerala Parota',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Chapathi"><span class="tw-dish-chip-name">Chapathi</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chapathi',-1)">−</button><span class="qty-num" id="toq-Chapathi">0</span><button class="qty-btn" onclick="toQty('Chapathi',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Rice Pathiri"><span class="tw-dish-chip-name">Rice Pathiri</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Rice Pathiri',-1)">−</button><span class="qty-num" id="toq-Rice Pathiri">0</span><button class="qty-btn" onclick="toQty('Rice Pathiri',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Idiyappam"><span class="tw-dish-chip-name">Idiyappam</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Idiyappam',-1)">−</button><span class="qty-num" id="toq-Idiyappam">0</span><button class="qty-btn" onclick="toQty('Idiyappam',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Plain Dosa"><span class="tw-dish-chip-name">Plain Dosa</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Plain Dosa',-1)">−</button><span class="qty-num" id="toq-Plain Dosa">0</span><button class="qty-btn" onclick="toQty('Plain Dosa',1)">+</button></div></div>
+      </div>
+      <div class="dish-section-title">🥘 Curries</div>
+      <div class="dish-grid">
+        <div class="tw-dish-chip" id="toc-Chicken Ghee Roast"><span class="tw-dish-chip-name">Chicken Ghee Roast</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Ghee Roast',-1)">−</button><span class="qty-num" id="toq-Chicken Ghee Roast">0</span><button class="qty-btn" onclick="toQty('Chicken Ghee Roast',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Chicken Sukka"><span class="tw-dish-chip-name">Chicken Sukka</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Sukka',-1)">−</button><span class="qty-num" id="toq-Chicken Sukka">0</span><button class="qty-btn" onclick="toQty('Chicken Sukka',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Mutton Rogan Josh"><span class="tw-dish-chip-name">Mutton Rogan Josh</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Mutton Rogan Josh',-1)">−</button><span class="qty-num" id="toq-Mutton Rogan Josh">0</span><button class="qty-btn" onclick="toQty('Mutton Rogan Josh',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Beef Fry"><span class="tw-dish-chip-name">Beef Fry</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Beef Fry',-1)">−</button><span class="qty-num" id="toq-Beef Fry">0</span><button class="qty-btn" onclick="toQty('Beef Fry',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Chicken Curry"><span class="tw-dish-chip-name">Chicken Curry</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Chicken Curry',-1)">−</button><span class="qty-num" id="toq-Chicken Curry">0</span><button class="qty-btn" onclick="toQty('Chicken Curry',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Mutton Stew"><span class="tw-dish-chip-name">Mutton Stew</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Mutton Stew',-1)">−</button><span class="qty-num" id="toq-Mutton Stew">0</span><button class="qty-btn" onclick="toQty('Mutton Stew',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Beef Masala"><span class="tw-dish-chip-name">Beef Masala</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Beef Masala',-1)">−</button><span class="qty-num" id="toq-Beef Masala">0</span><button class="qty-btn" onclick="toQty('Beef Masala',1)">+</button></div></div>
+      </div>
+      <div class="dish-section-title">🍨 Desserts</div>
+      <div class="dish-grid">
+        <div class="tw-dish-chip" id="toc-Gadbad Ice Cream"><span class="tw-dish-chip-name">Gadbad Ice Cream</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Gadbad Ice Cream',-1)">−</button><span class="qty-num" id="toq-Gadbad Ice Cream">0</span><button class="qty-btn" onclick="toQty('Gadbad Ice Cream',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Caramel Custard"><span class="tw-dish-chip-name">Caramel Custard</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Caramel Custard',-1)">−</button><span class="qty-num" id="toq-Caramel Custard">0</span><button class="qty-btn" onclick="toQty('Caramel Custard',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Gulab Jamun"><span class="tw-dish-chip-name">Gulab Jamun</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Gulab Jamun',-1)">−</button><span class="qty-num" id="toq-Gulab Jamun">0</span><button class="qty-btn" onclick="toQty('Gulab Jamun',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Payasam"><span class="tw-dish-chip-name">Payasam</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Payasam',-1)">−</button><span class="qty-num" id="toq-Payasam">0</span><button class="qty-btn" onclick="toQty('Payasam',1)">+</button></div></div>
+      </div>
+      <div class="dish-section-title">🥤 Drinks</div>
+      <div class="dish-grid">
+        <div class="tw-dish-chip" id="toc-Fresh Lime Soda"><span class="tw-dish-chip-name">Fresh Lime Soda</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Fresh Lime Soda',-1)">−</button><span class="qty-num" id="toq-Fresh Lime Soda">0</span><button class="qty-btn" onclick="toQty('Fresh Lime Soda',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Mango Lassi"><span class="tw-dish-chip-name">Mango Lassi</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Mango Lassi',-1)">−</button><span class="qty-num" id="toq-Mango Lassi">0</span><button class="qty-btn" onclick="toQty('Mango Lassi',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Buttermilk"><span class="tw-dish-chip-name">Buttermilk</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Buttermilk',-1)">−</button><span class="qty-num" id="toq-Buttermilk">0</span><button class="qty-btn" onclick="toQty('Buttermilk',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Cold Coffee"><span class="tw-dish-chip-name">Cold Coffee</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Cold Coffee',-1)">−</button><span class="qty-num" id="toq-Cold Coffee">0</span><button class="qty-btn" onclick="toQty('Cold Coffee',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Falooda"><span class="tw-dish-chip-name">Falooda</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Falooda',-1)">−</button><span class="qty-num" id="toq-Falooda">0</span><button class="qty-btn" onclick="toQty('Falooda',1)">+</button></div></div>
+        <div class="tw-dish-chip" id="toc-Soft Drinks"><span class="tw-dish-chip-name">Soft Drinks</span><div class="qty-ctrl"><button class="qty-btn" onclick="toQty('Soft Drinks',-1)">−</button><span class="qty-num" id="toq-Soft Drinks">0</span><button class="qty-btn" onclick="toQty('Soft Drinks',1)">+</button></div></div>
+      </div>
+
+      <button class="form-submit" id="toSubmitBtn" style="margin-top:1.5rem;" onclick="toSubmit()">
+        <span id="toSubmitText">Place Order ✦</span>
+      </button>
+      <p class="form-note" id="toOrderError" style="color:#e07060;display:none;margin-top:0.5rem;">Please select at least one dish.</p>
+    </div>
+
+    <div class="tw-success" id="toSuccess">
+      <div class="tw-success-icon">🪑</div>
+      <div class="success-title">Order <em>Sent!</em></div>
+      <p class="success-text">Your order is on its way to the kitchen.<br>We'll bring it to your table shortly.</p>
+      <div id="toSuccessItems" style="max-width:380px;margin:1rem auto;text-align:left;padding:0.9rem 1.25rem;border:1px solid var(--divider);background:rgba(201,168,76,0.04);font-family:'Raleway',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gold-dim);line-height:2;"></div>
+      <div class="success-ref" id="toRef">—</div>
+      <button class="btn-gold" onclick="closeTableOrder()" style="border:none;margin-top:1.5rem;"><span>Close</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── RESERVATION DISH QUANTITIES ──────────────────────────
+  const resCart = {};
+  function resQty(dish, delta) {
+    resCart[dish] = Math.max(0, (resCart[dish] || 0) + delta);
+    const qEl = document.getElementById('resq-' + dish);
+    const cEl = document.getElementById('resc-' + dish);
+    if (qEl) qEl.textContent = resCart[dish];
+    if (cEl) cEl.classList.toggle('in-cart', resCart[dish] > 0);
+    const total = Object.values(resCart).reduce((s,v) => s+v, 0);
+    const items = Object.keys(resCart).filter(k => resCart[k] > 0).length;
+    document.getElementById('resDishCount').textContent = total;
+    document.getElementById('resDishLabel').innerHTML = total > 0
+      ? `<strong>${total} item${total!==1?'s':''}</strong> across ${items} dish${items!==1?'es':''} selected`
+      : 'Select dishes to pre-order (optional)';
+  }
+  function getResCartString() {
+    return Object.entries(resCart).filter(([,v])=>v>0).map(([d,q])=>`${q}x ${d}`).join(', ');
+  }
+
+  // ─── TABLE ORDER ──────────────────────────────────────────
+  const toCart = {};
+  function openTableOrder() {
+    document.getElementById('tableOrderOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeTableOrder() {
+    document.getElementById('tableOrderOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function toQty(dish, delta) {
+    toCart[dish] = Math.max(0, (toCart[dish] || 0) + delta);
+    const qEl = document.getElementById('toq-' + dish);
+    const cEl = document.getElementById('toc-' + dish);
+    if (qEl) qEl.textContent = toCart[dish];
+    if (cEl) cEl.classList.toggle('in-cart', toCart[dish] > 0);
+    const total = Object.values(toCart).reduce((s,v) => s+v, 0);
+    const items = Object.keys(toCart).filter(k => toCart[k] > 0).length;
+    document.getElementById('toCartCount').textContent = total;
+    document.getElementById('toCartLabel').innerHTML = total > 0
+      ? `<strong>${total} item${total!==1?'s':''}</strong> across ${items} dish${items!==1?'es':''}`
+      : 'Select your dishes';
+  }
+
+  async function toSubmit() {
+    const table = document.getElementById('to_table').value;
+    const phone = document.getElementById('to_phone').value.trim();
+    const total = Object.values(toCart).reduce((s,v) => s+v, 0);
+
+    document.getElementById('toInfoError').style.display = 'none';
+    document.getElementById('toOrderError').style.display = 'none';
+
+    if (!table || !phone) { document.getElementById('toInfoError').style.display = 'block'; return; }
+    if (total === 0)       { document.getElementById('toOrderError').style.display = 'block'; return; }
+
+    const btn = document.getElementById('toSubmitBtn');
+    btn.disabled = true;
+    document.getElementById('toSubmitText').textContent = 'Sending order…';
+
+    const items = Object.entries(toCart).filter(([,v])=>v>0).map(([d,q])=>`${q}x ${d}`).join(', ');
+    const ref   = 'TO-' + Date.now().toString(36).toUpperCase();
+
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/table_orders', {
+        method: 'POST',
+        headers: { ...sbHeaders(SUPABASE_ANON), 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ ref, table_number: table, phone, items, created_at: new Date().toISOString() })
+      });
+      if (!res.ok) throw new Error((await res.json().catch(()=>({}))).message || 'Failed');
+
+      document.getElementById('toFormBody').style.display = 'none';
+      document.getElementById('toSuccessItems').innerHTML =
+        `<strong style="color:var(--gold);">${table}</strong><br>` +
+        Object.entries(toCart).filter(([,v])=>v>0).map(([d,q])=>`× ${q} &nbsp;${d}`).join('<br>');
+      document.getElementById('toRef').textContent = ref;
+      document.getElementById('toSuccess').classList.add('show');
+    } catch(err) {
+      document.getElementById('toOrderError').textContent = 'Error: ' + err.message;
+      document.getElementById('toOrderError').style.display = 'block';
+      btn.disabled = false;
+      document.getElementById('toSubmitText').textContent = 'Place Order ✦';
     }
   }
 </script>
