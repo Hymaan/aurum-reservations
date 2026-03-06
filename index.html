@@ -2649,7 +2649,9 @@
   function updateDishSummary() {
     // No-op — summary handled by resQty cart bar
   }
-  }
+
+  // ─── RESERVATION DISH CART (declared here so getSelectedDishes can use it) ──
+  const resCart = {};
 
   // ─── SUPABASE CONFIG ──────────────────────────────────────────
   // 🔧 REPLACE these two values with your own from Supabase dashboard
@@ -3220,6 +3222,8 @@
       document.getElementById('twSubmitText').textContent = 'Place Takeaway Order ✦';
     }
   }
+</script>
+
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- ORDER FROM TABLE MODAL                                       -->
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -3328,7 +3332,6 @@
 
 <script>
   // ─── RESERVATION DISH QUANTITIES ──────────────────────────
-  const resCart = {};
   function resQty(dish, delta) {
     resCart[dish] = Math.max(0, (resCart[dish] || 0) + delta);
     const qEl = document.getElementById('resq-' + dish);
