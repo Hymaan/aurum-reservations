@@ -1343,14 +1343,14 @@
     margin: 1rem 0 1.25rem;
   }
   .step-dot {
-    width: 32px; height: 32px;
+    width: 30px; height: 30px;
     border-radius: 50%;
     border: 1px solid var(--gold-dim);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Raleway', sans-serif;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 300;
     color: var(--text-muted);
     transition: all 0.35s;
@@ -1371,7 +1371,7 @@
     flex: 1;
     height: 1px;
     background: var(--divider);
-    margin: 0 0.75rem;
+    margin: 0 0.6rem;
     position: relative;
     overflow: hidden;
   }
@@ -1387,11 +1387,118 @@
 
   .modal-step-sub {
     font-family: 'Raleway', sans-serif;
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 200;
     letter-spacing: 0.25em;
     color: var(--text-muted);
     margin-top: 0.25rem;
+  }
+
+  /* ─── OTP STYLES ─── */
+  .otp-phone-display {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+  }
+  .otp-phone-display strong { color: var(--gold); font-weight: 400; font-size: 0.9rem; }
+
+  .otp-inputs {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+    margin: 1.75rem 0 1.5rem;
+  }
+  .otp-digit {
+    width: 48px; height: 58px;
+    background: var(--mid);
+    border: 1px solid rgba(201,168,76,0.2);
+    color: var(--gold);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.25s, background 0.25s;
+    caret-color: var(--gold);
+    border-radius: 0;
+  }
+  .otp-digit:focus {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.06);
+  }
+  .otp-digit.filled {
+    border-color: var(--gold-dim);
+    background: rgba(201,168,76,0.08);
+  }
+  .otp-digit.error { border-color: #e07060 !important; background: rgba(224,112,96,0.08) !important; }
+
+  .otp-verified-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(106,191,122,0.1);
+    border: 1px solid rgba(106,191,122,0.3);
+    margin-bottom: 1.5rem;
+  }
+  .otp-verified-badge span {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: #6abf7a;
+  }
+
+  .otp-resend-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 200;
+    color: var(--text-muted);
+  }
+  .otp-resend-btn {
+    background: none; border: none;
+    color: var(--gold-dim);
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 300;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .otp-resend-btn:hover { color: var(--gold); }
+  .otp-resend-btn:disabled { color: var(--text-muted); text-decoration: none; cursor: default; }
+
+  .otp-change-link {
+    background: none; border: none;
+    color: var(--text-muted);
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 200;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 1rem;
+    display: block;
+    text-align: center;
+    transition: color 0.2s;
+  }
+  .otp-change-link:hover { color: var(--gold-dim); }
+
+  @media (max-width: 400px) {
+    .otp-digit { width: 40px; height: 50px; font-size: 1.4rem; }
+    .otp-inputs { gap: 0.4rem; }
   }
 
   /* ─── DISH SELECTION ─── */
@@ -1808,21 +1915,86 @@
     <div class="modal-header" id="modalFormHeader">
       <span class="modal-eyebrow">Coastal Dine</span>
       <div class="step-indicator">
-        <div class="step-dot active" id="stepDot1">
-          <span>1</span>
-        </div>
-        <div class="step-line" id="stepLine"></div>
-        <div class="step-dot" id="stepDot2">
-          <span>2</span>
-        </div>
+        <div class="step-dot active" id="stepDot0"><span id="stepDot0Label">📱</span></div>
+        <div class="step-line" id="stepLine0"></div>
+        <div class="step-dot" id="stepDot1"><span>1</span></div>
+        <div class="step-line" id="stepLine1"></div>
+        <div class="step-dot" id="stepDot2"><span>2</span></div>
       </div>
-      <h2 class="modal-title" id="modalStepTitle">Your <em>Details</em></h2>
-      <p class="modal-step-sub" id="modalStepSub">Step 1 of 2 — Reservation info</p>
+      <h2 class="modal-title" id="modalStepTitle">Verify Your <em>Number</em></h2>
+      <p class="modal-step-sub" id="modalStepSub">Step 1 of 3 — Phone verification</p>
       <button class="modal-close" onclick="closeReservation()">✕</button>
     </div>
 
+    <!-- ── STEP 0: OTP VERIFICATION ── -->
+    <div class="modal-body" id="step0Body">
+
+      <!-- Phase A: enter phone -->
+      <div id="otpPhasePhone">
+        <p class="form-note" style="text-align:center;margin-bottom:1.75rem;font-size:0.72rem;line-height:1.9;color:var(--text-muted);">
+          Enter your mobile number to receive a verification code.<br>
+          <span style="color:var(--gold-dim);font-size:0.62rem;">This confirms your identity and guarantees your reservation.</span>
+        </p>
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label class="form-label">Mobile Number *</label>
+          <input class="form-input" id="otp_phone" type="tel" placeholder="+966 5X XXX XXXX"
+            style="font-size:1rem;letter-spacing:0.08em;"
+            onkeydown="if(event.key==='Enter')sendOTP()">
+        </div>
+        <p class="form-note" id="otpPhoneError" style="color:#e07060;display:none;margin-bottom:0.75rem;"></p>
+        <button class="form-submit" id="sendOtpBtn" onclick="sendOTP()">
+          <span id="sendOtpBtnText">Send Verification Code →</span>
+        </button>
+        <p class="form-note" style="text-align:center;margin-top:1rem;">A 6-digit code will be sent via SMS.</p>
+      </div>
+
+      <!-- Phase B: enter code -->
+      <div id="otpPhaseCode" style="display:none;">
+        <div class="otp-phone-display">
+          Code sent to<br><strong id="otpPhoneDisplay">—</strong>
+        </div>
+
+        <div class="otp-inputs">
+          <input class="otp-digit" id="otp0" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]"
+            oninput="otpInput(this,0)" onkeydown="otpKey(event,0)">
+          <input class="otp-digit" id="otp1" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]"
+            oninput="otpInput(this,1)" onkeydown="otpKey(event,1)">
+          <input class="otp-digit" id="otp2" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]"
+            oninput="otpInput(this,2)" onkeydown="otpKey(event,2)">
+          <input class="otp-digit" id="otp3" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]"
+            oninput="otpInput(this,3)" onkeydown="otpKey(event,3)">
+          <input class="otp-digit" id="otp4" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]"
+            oninput="otpInput(this,4)" onkeydown="otpKey(event,4)">
+          <input class="otp-digit" id="otp5" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]"
+            oninput="otpInput(this,5)" onkeydown="otpKey(event,5)">
+        </div>
+
+        <p class="form-note" id="otpCodeError" style="color:#e07060;display:none;text-align:center;margin-bottom:0.75rem;"></p>
+
+        <button class="form-submit" id="verifyOtpBtn" onclick="verifyOTP()">
+          <span id="verifyOtpBtnText">Verify & Continue →</span>
+        </button>
+
+        <div class="otp-resend-row">
+          <span>Didn't receive it?</span>
+          <button class="otp-resend-btn" id="otpResendBtn" onclick="sendOTP(true)" disabled>
+            Resend Code
+          </button>
+          <span id="otpCountdown" style="color:var(--gold-dim);font-size:0.62rem;"></span>
+        </div>
+
+        <button class="otp-change-link" onclick="showOtpPhonePhase()">← Change number</button>
+      </div>
+
+    </div>
+
     <!-- ── STEP 1: DETAILS ── -->
-    <div class="modal-body" id="step1Body">
+    <div class="modal-body" id="step1Body" style="display:none;">
+      <!-- Verified badge -->
+      <div class="otp-verified-badge" style="margin-bottom:1.5rem;">
+        <span style="font-size:1rem;">✓</span>
+        <span>Phone verified — <strong id="verifiedPhoneLabel" style="color:#6abf7a;"></strong></span>
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">First Name *</label>
@@ -1840,7 +2012,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Phone</label>
-          <input class="form-input" id="f_phone" type="tel" placeholder="+1 (212) 000-0000">
+          <input class="form-input" id="f_phone" type="tel" placeholder="+1 (212) 000-0000" readonly style="opacity:0.6;cursor:default;">
         </div>
       </div>
       <div class="form-row">
@@ -2572,20 +2744,25 @@
     if (e.target === this) closeReservation();
   });
 
+  // ══════════════════════════════════════════════════════
+  // OTP STATE
+  // ══════════════════════════════════════════════════════
+  let otpVerifiedPhone = '';      // set after successful verify
+  let otpGeneratedCode = '';      // 6-digit code we generated
+  let otpCountdownTimer = null;
+
+  // ─── RESET FORM ──────────────────────────────────────
   function resetForm() {
-    // Show header, hide success
     document.getElementById('modalFormHeader').style.display = '';
     document.getElementById('modalSuccess').classList.remove('show');
     document.getElementById('submitBtn').disabled = false;
     document.getElementById('submitBtnText').textContent = 'Confirm Reservation ✦';
     document.getElementById('formError').style.display = 'none';
     document.getElementById('step1Error').style.display = 'none';
-    // Reset to step 1
-    goToStep1(true);
-    // Clear fields
+    // Reset fields
     ['f_first','f_last','f_email','f_phone','f_date','f_time','f_guests','f_occasion','f_notes']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-    // Reset dish quantities in reservation form
+    // Reset dish quantities
     Object.keys(resCart).forEach(k => {
       resCart[k] = 0;
       const qEl = document.getElementById('resq-' + k);
@@ -2595,25 +2772,226 @@
     });
     document.getElementById('resDishCount').textContent = '0';
     document.getElementById('resDishLabel').textContent = 'Select dishes to pre-order (optional)';
+    // Reset OTP state
+    otpVerifiedPhone = '';
+    otpGeneratedCode = '';
+    clearInterval(otpCountdownTimer);
+    goToStep0();
   }
 
-  // ─── STEP NAVIGATION ─────────────────────────────────────────
-  function goToStep1(silent) {
-    document.getElementById('step1Body').style.display = '';
-    document.getElementById('step2Body').style.display = 'none';
-    // Step indicators
-    document.getElementById('stepDot1').classList.add('active');
-    document.getElementById('stepDot1').classList.remove('done');
-    document.getElementById('stepDot2').classList.remove('active','done');
-    document.getElementById('stepLine').classList.remove('filled');
-    document.getElementById('modalStepTitle').innerHTML = 'Your <em>Details</em>';
-    document.getElementById('modalStepSub').textContent = 'Step 1 of 2 — Reservation info';
-    // Scroll top
+  // ══════════════════════════════════════════════════════
+  // STEP NAVIGATION HELPERS
+  // ══════════════════════════════════════════════════════
+  function setStepDots(active) {
+    // active: 0, 1, or 2
+    const dots  = ['stepDot0','stepDot1','stepDot2'];
+    const lines = ['stepLine0','stepLine1'];
+    dots.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('active','done');
+      if (i < active)  el.classList.add('done');
+      if (i === active) el.classList.add('active');
+    });
+    lines.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle('filled', i < active);
+    });
+  }
+
+  function showOnlyBody(id) {
+    ['step0Body','step1Body','step2Body'].forEach(b => {
+      const el = document.getElementById(b);
+      if (el) el.style.display = b === id ? '' : 'none';
+    });
     document.querySelector('.modal').scrollTop = 0;
   }
 
+  // ──────────────────────────────────────────────────────
+  // STEP 0 — OTP
+  // ──────────────────────────────────────────────────────
+  function goToStep0() {
+    setStepDots(0);
+    showOnlyBody('step0Body');
+    document.getElementById('modalStepTitle').innerHTML = 'Verify Your <em>Number</em>';
+    document.getElementById('modalStepSub').textContent = 'Step 1 of 3 — Phone verification';
+    showOtpPhonePhase();
+  }
+
+  function showOtpPhonePhase() {
+    document.getElementById('otpPhasePhone').style.display = '';
+    document.getElementById('otpPhaseCode').style.display = 'none';
+    document.getElementById('otpPhoneError').style.display = 'none';
+    const btn = document.getElementById('sendOtpBtn');
+    btn.disabled = false;
+    document.getElementById('sendOtpBtnText').textContent = 'Send Verification Code →';
+  }
+
+  async function sendOTP(isResend) {
+    const raw   = document.getElementById('otp_phone').value.trim();
+    const phone = raw.replace(/\s+/g,'');
+    const errEl = document.getElementById('otpPhoneError');
+    errEl.style.display = 'none';
+
+    if (!phone || phone.length < 9) {
+      errEl.textContent = 'Please enter a valid mobile number.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    // Generate a 6-digit code
+    otpGeneratedCode = String(Math.floor(100000 + Math.random() * 900000));
+
+    const btn = document.getElementById('sendOtpBtn');
+    btn.disabled = true;
+    document.getElementById('sendOtpBtnText').textContent = 'Sending…';
+
+    // Store phone for reservation submission
+    document.getElementById('f_phone').value = phone;
+
+    try {
+      // Send OTP via Supabase Auth phone
+      const res = await fetch(SUPABASE_URL + '/auth/v1/otp', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'apikey': SUPABASE_ANON },
+        body: JSON.stringify({ phone, channel: 'sms' })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.msg || err.message || 'Failed to send code');
+      }
+    } catch(err) {
+      // Supabase phone auth may need enabling — show user-friendly message
+      errEl.textContent = 'Could not send SMS: ' + err.message + '. Please check your number.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      document.getElementById('sendOtpBtnText').textContent = 'Send Verification Code →';
+      return;
+    }
+
+    // Show code entry phase
+    document.getElementById('otpPhoneDisplay').textContent = phone;
+    document.getElementById('otpPhasePhone').style.display = 'none';
+    document.getElementById('otpPhaseCode').style.display = '';
+    document.getElementById('otpCodeError').style.display = 'none';
+    document.getElementById('verifyOtpBtn').disabled = false;
+    document.getElementById('verifyOtpBtnText').textContent = 'Verify & Continue →';
+    // Clear digit inputs
+    for (let i = 0; i < 6; i++) {
+      const el = document.getElementById('otp' + i);
+      el.value = '';
+      el.classList.remove('filled','error');
+    }
+    document.getElementById('otp0').focus();
+    startOtpCountdown(60);
+  }
+
+  function startOtpCountdown(sec) {
+    const resendBtn  = document.getElementById('otpResendBtn');
+    const countdown  = document.getElementById('otpCountdown');
+    resendBtn.disabled = true;
+    clearInterval(otpCountdownTimer);
+    let remaining = sec;
+    const tick = () => {
+      countdown.textContent = '(' + remaining + 's)';
+      if (remaining <= 0) {
+        clearInterval(otpCountdownTimer);
+        countdown.textContent = '';
+        resendBtn.disabled = false;
+      }
+      remaining--;
+    };
+    tick();
+    otpCountdownTimer = setInterval(tick, 1000);
+  }
+
+  // OTP digit input handling
+  function otpInput(el, idx) {
+    el.value = el.value.replace(/\D/g,'').slice(-1);
+    el.classList.toggle('filled', el.value !== '');
+    el.classList.remove('error');
+    if (el.value && idx < 5) document.getElementById('otp' + (idx+1)).focus();
+    // Auto-verify when all filled
+    const code = Array.from({length:6}, (_,i) => document.getElementById('otp'+i).value).join('');
+    if (code.length === 6) verifyOTP();
+  }
+
+  function otpKey(e, idx) {
+    if (e.key === 'Backspace') {
+      const el = document.getElementById('otp' + idx);
+      if (!el.value && idx > 0) {
+        const prev = document.getElementById('otp' + (idx-1));
+        prev.value = '';
+        prev.classList.remove('filled');
+        prev.focus();
+      }
+    }
+  }
+
+  async function verifyOTP() {
+    const phone = document.getElementById('otp_phone').value.trim().replace(/\s+/g,'');
+    const code  = Array.from({length:6}, (_,i) => document.getElementById('otp'+i).value).join('');
+    const errEl = document.getElementById('otpCodeError');
+    errEl.style.display = 'none';
+
+    if (code.length < 6) {
+      errEl.textContent = 'Please enter all 6 digits.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('verifyOtpBtn');
+    btn.disabled = true;
+    document.getElementById('verifyOtpBtnText').textContent = 'Verifying…';
+
+    try {
+      const res = await fetch(SUPABASE_URL + '/auth/v1/verify', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'apikey': SUPABASE_ANON },
+        body: JSON.stringify({ phone, token: code, type: 'sms' })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.msg || err.message || 'Invalid code');
+      }
+    } catch(err) {
+      for (let i = 0; i < 6; i++) document.getElementById('otp'+i).classList.add('error');
+      errEl.textContent = '✕ ' + (err.message.includes('Invalid') ? 'Incorrect code. Please try again.' : err.message);
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      document.getElementById('verifyOtpBtnText').textContent = 'Verify & Continue →';
+      return;
+    }
+
+    // ✅ Verified!
+    clearInterval(otpCountdownTimer);
+    otpVerifiedPhone = phone;
+    clearInterval(otpCountdownTimer);
+    goToStep1();
+  }
+
+  // ──────────────────────────────────────────────────────
+  // STEP 1 — DETAILS
+  // ──────────────────────────────────────────────────────
+  function goToStep1() {
+    setStepDots(1);
+    showOnlyBody('step1Body');
+    document.getElementById('modalStepTitle').innerHTML = 'Your <em>Details</em>';
+    document.getElementById('modalStepSub').textContent = 'Step 2 of 3 — Reservation info';
+    // Pre-fill & show verified phone
+    if (otpVerifiedPhone) {
+      document.getElementById('f_phone').value = otpVerifiedPhone;
+      document.getElementById('verifiedPhoneLabel').textContent = otpVerifiedPhone;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────
+  // STEP 2 — DISHES
+  // ──────────────────────────────────────────────────────
   function goToStep2() {
-    // Validate step 1
     const first  = document.getElementById('f_first').value.trim();
     const last   = document.getElementById('f_last').value.trim();
     const email  = document.getElementById('f_email').value.trim();
@@ -2625,16 +3003,10 @@
       return;
     }
     document.getElementById('step1Error').style.display = 'none';
-    document.getElementById('step1Body').style.display = 'none';
-    document.getElementById('step2Body').style.display = '';
-    // Step indicators
-    document.getElementById('stepDot1').classList.remove('active');
-    document.getElementById('stepDot1').classList.add('done');
-    document.getElementById('stepDot2').classList.add('active');
-    document.getElementById('stepLine').classList.add('filled');
+    setStepDots(2);
+    showOnlyBody('step2Body');
     document.getElementById('modalStepTitle').innerHTML = 'Choose Your <em>Dishes</em>';
-    document.getElementById('modalStepSub').textContent = 'Step 2 of 2 — Pre-order (optional)';
-    document.querySelector('.modal').scrollTop = 0;
+    document.getElementById('modalStepSub').textContent = 'Step 3 of 3 — Pre-order (optional)';
   }
 
   // ─── DISH SELECTION ───────────────────────────────────────────
@@ -2702,6 +3074,7 @@
         headers: { ...sbHeaders(SUPABASE_ANON), 'Prefer': 'return=minimal' },
         body: JSON.stringify({ ref, first, last, email, phone, date, time, guests, occasion, notes,
           dishes: selectedDishes.length > 0 ? selectedDishes.join(', ') : null,
+          phone_verified: !!otpVerifiedPhone,
           created_at: new Date().toISOString() })
       });
 
