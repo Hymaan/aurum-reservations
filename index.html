@@ -2724,30 +2724,61 @@
   document.addEventListener('DOMContentLoaded', async () => {
     initPrices();
 
-    // ── Load inventory from Supabase and block out-of-stock items ──
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/inventory?select=dish,in_stock&in_stock=eq.false', {
-        headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON }
-      });
-      if (res.ok) {
-        const outOfStock = await res.json();
-        outOfStock.forEach(({ dish }) => {
-          // Block in all 3 order flows: res, tw, to
+    // ── Live inventory polling ────────────────────────────────
+    // Tracks last known state so we only update chips that changed
+    let lastInventoryState = {}; // dish → true/false
+
+    async function syncInventory() {
+      try {
+        const res = await fetch(SUPABASE_URL + '/rest/v1/inventory?select=dish,in_stock', {
+          headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON }
+        });
+        if (!res.ok) return;
+        const rows = await res.json();
+
+        // Build new state map
+        const newState = {};
+        rows.forEach(r => { newState[r.dish] = r.in_stock; });
+
+        // Find dishes whose state changed since last check
+        const allDishes = new Set([...Object.keys(lastInventoryState), ...Object.keys(newState)]);
+        allDishes.forEach(dish => {
+          const wasInStock = lastInventoryState[dish] !== false; // default true if unknown
+          const nowInStock = newState[dish] !== false;           // default true if not in DB
+          if (wasInStock === nowInStock) return; // no change
+
+          // Apply change to all 3 order flow chips
           ['resc-', 'twc-', 'toc-'].forEach(prefix => {
             const chip = document.getElementById(prefix + dish);
             if (!chip) return;
-            chip.classList.add('out-of-stock-chip');
-            // Disable qty buttons
-            chip.querySelectorAll('.qty-btn').forEach(b => b.disabled = true);
-            // Show out-of-stock badge
-            const badge = document.createElement('span');
-            badge.className = 'oos-badge';
-            badge.textContent = 'Out of Stock';
-            chip.appendChild(badge);
+
+            if (!nowInStock) {
+              // Mark as out of stock
+              chip.classList.add('out-of-stock-chip');
+              chip.querySelectorAll('.qty-btn').forEach(b => b.disabled = true);
+              if (!chip.querySelector('.oos-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'oos-badge';
+                badge.textContent = 'Out of Stock';
+                chip.appendChild(badge);
+              }
+            } else {
+              // Restore to in stock — remove block
+              chip.classList.remove('out-of-stock-chip');
+              chip.querySelectorAll('.qty-btn').forEach(b => b.disabled = false);
+              const badge = chip.querySelector('.oos-badge');
+              if (badge) badge.remove();
+            }
           });
         });
-      }
-    } catch(e) { /* silently fail — don't block ordering */ }
+
+        lastInventoryState = newState;
+      } catch(e) { /* silent fail */ }
+    }
+
+    // Run immediately on load, then every 10 seconds
+    await syncInventory();
+    setInterval(syncInventory, 10000);
 
     // Auto-open table order modal if URL has ?table=
     const params = new URLSearchParams(window.location.search);
