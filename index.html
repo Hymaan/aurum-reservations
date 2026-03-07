@@ -2702,7 +2702,27 @@
     return Object.entries(cart).reduce((sum, [dish, qty]) => sum + qty * (PRICES[dish] || 0), 0);
   }
 
-  document.addEventListener('DOMContentLoaded', initPrices);
+  document.addEventListener('DOMContentLoaded', () => {
+    initPrices();
+    // Auto-open table order modal if URL has ?table=N or #order-table
+    const params = new URLSearchParams(window.location.search);
+    const tableNum = params.get('table');
+    if (tableNum || window.location.hash === '#order') {
+      openTableOrder();
+      if (tableNum) {
+        const sel = document.getElementById('to_table');
+        if (sel) {
+          // Try to match option value
+          for (let opt of sel.options) {
+            if (opt.value === tableNum || opt.text.includes(tableNum)) {
+              sel.value = opt.value;
+              break;
+            }
+          }
+        }
+      }
+    }
+  });
 
   // ─── SUPABASE CONFIG ──────────────────────────────────────────
   // 🔧 REPLACE these two values with your own from Supabase dashboard
