@@ -1686,6 +1686,17 @@
     flex: 1;
   }
   .tw-dish-chip.in-cart .tw-dish-chip-name { color: var(--gold-light); }
+  .tw-dish-chip-price {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 300;
+    color: var(--gold-dim);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+  }
+  .tw-dish-chip.in-cart .tw-dish-chip-price { color: var(--gold); }
   .qty-ctrl {
     display: flex;
     align-items: center;
@@ -2644,6 +2655,55 @@
   // ─── RESERVATION DISH CART (declared here so getSelectedDishes can use it) ──
   const resCart = {};
 
+  // ─── MENU PRICES (SAR) ───────────────────────────────────────
+  const PRICES = {
+    // Chicken Starters
+    'Chicken Popcorn': 28, 'Chicken Lollipop': 38, 'Chicken 65': 32,
+    'Chicken Wings': 35,   'Chicken Pakora': 28,   'Chicken Strips': 30,
+    // Rice & Combos
+    'Chicken Biryani Combo': 52, 'Mutton Biryani Combo': 62,
+    'Ghee Rice Combo': 45,       'Boiled Rice with Curry': 38,
+    'Chicken Thali': 65,         'Mutton Thali': 75,
+    // Breads
+    'Kerala Parota': 8, 'Chapathi': 7, 'Rice Pathiri': 9,
+    'Idiyappam': 10,    'Plain Dosa': 18,
+    // Curries & Mains
+    'Chicken Ghee Roast': 48, 'Chicken Sukka': 45,
+    'Mutton Rogan Josh': 58,  'Beef Fry': 48,
+    'Chicken Curry': 42,      'Mutton Stew': 55, 'Beef Masala': 48,
+    // Desserts
+    'Gadbad Ice Cream': 22, 'Caramel Custard': 18,
+    'Gulab Jamun': 16,      'Kesari Bath': 14, 'Payasam': 16,
+    // Beverages
+    'Fresh Lime Soda': 14, 'Mango Lassi': 18, 'Buttermilk': 12,
+    'Cold Coffee': 20,     'Falooda': 22,     'Soft Drinks': 10
+  };
+
+  // Inject price spans into all order-flow chips (reservation, takeaway, dining)
+  function initPrices() {
+    ['resc-', 'twc-', 'toc-'].forEach(prefix => {
+      Object.keys(PRICES).forEach(dish => {
+        const chip = document.getElementById(prefix + dish);
+        if (!chip) return;
+        // Only inject once
+        if (chip.querySelector('.tw-dish-chip-price')) return;
+        const nameEl = chip.querySelector('.tw-dish-chip-name');
+        const priceEl = document.createElement('span');
+        priceEl.className = 'tw-dish-chip-price';
+        priceEl.textContent = 'SAR ' + PRICES[dish];
+        // Insert between name and qty-ctrl
+        nameEl.insertAdjacentElement('afterend', priceEl);
+      });
+    });
+  }
+
+  // Compute SAR total for any cart object
+  function cartTotal(cart) {
+    return Object.entries(cart).reduce((sum, [dish, qty]) => sum + qty * (PRICES[dish] || 0), 0);
+  }
+
+  document.addEventListener('DOMContentLoaded', initPrices);
+
   // ─── SUPABASE CONFIG ──────────────────────────────────────────
   // 🔧 REPLACE these two values with your own from Supabase dashboard
   // Project Settings → API → Project URL + anon key + service_role key
@@ -2949,12 +3009,12 @@
       if (twCart[dish] > 0) cEl.classList.add('in-cart');
       else cEl.classList.remove('in-cart');
     }
-    // Update cart count badge
     const total = Object.values(twCart).reduce((s,v) => s+v, 0);
     const totalItems = Object.entries(twCart).filter(([,v]) => v>0).length;
+    const sar = cartTotal(twCart);
     document.getElementById('twCartCount').textContent = total;
     document.getElementById('twCartLabel').innerHTML = total > 0
-      ? `<strong>${total} item${total!==1?'s':''}</strong> across ${totalItems} dish${totalItems!==1?'es':''}`
+      ? `<strong>${total} item${total!==1?'s':''}</strong> · <span style="color:var(--gold);font-weight:400;">SAR ${sar}</span>`
       : 'Select dishes to add to your order';
   }
 
@@ -3188,10 +3248,10 @@
     if (qEl) qEl.textContent = resCart[dish];
     if (cEl) cEl.classList.toggle('in-cart', resCart[dish] > 0);
     const total = Object.values(resCart).reduce((s,v) => s+v, 0);
-    const items = Object.keys(resCart).filter(k => resCart[k] > 0).length;
+    const sar = cartTotal(resCart);
     document.getElementById('resDishCount').textContent = total;
     document.getElementById('resDishLabel').innerHTML = total > 0
-      ? `<strong>${total} item${total!==1?'s':''}</strong> across ${items} dish${items!==1?'es':''} selected`
+      ? `<strong>${total} item${total!==1?'s':''}</strong> pre-ordered · <span style="color:var(--gold);font-weight:400;">SAR ${sar}</span>`
       : 'Select dishes to pre-order (optional)';
   }
   function getResCartString() {
@@ -3215,10 +3275,10 @@
     if (qEl) qEl.textContent = toCart[dish];
     if (cEl) cEl.classList.toggle('in-cart', toCart[dish] > 0);
     const total = Object.values(toCart).reduce((s,v) => s+v, 0);
-    const items = Object.keys(toCart).filter(k => toCart[k] > 0).length;
+    const sar = cartTotal(toCart);
     document.getElementById('toCartCount').textContent = total;
     document.getElementById('toCartLabel').innerHTML = total > 0
-      ? `<strong>${total} item${total!==1?'s':''}</strong> across ${items} dish${items!==1?'es':''}`
+      ? `<strong>${total} item${total!==1?'s':''}</strong> · <span style="color:var(--gold);font-weight:400;">SAR ${sar}</span>`
       : 'Select your dishes';
   }
 
