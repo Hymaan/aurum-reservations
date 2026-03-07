@@ -1697,6 +1697,26 @@
     flex-shrink: 0;
   }
   .tw-dish-chip.in-cart .tw-dish-chip-price { color: var(--gold); }
+
+  /* ─── OUT OF STOCK ─── */
+  .out-of-stock-chip {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: not-allowed;
+    position: relative;
+  }
+  .oos-badge {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.48rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #e07060;
+    border: 1px solid rgba(224,112,96,0.4);
+    padding: 0.1rem 0.4rem;
+    flex-shrink: 0;
+    margin-left: 0.25rem;
+  }
   .qty-ctrl {
     display: flex;
     align-items: center;
@@ -2701,9 +2721,35 @@
     return Object.entries(cart).reduce((sum, [dish, qty]) => sum + qty * (PRICES[dish] || 0), 0);
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     initPrices();
-    // Auto-open table order modal if URL has ?table=N or #order-table
+
+    // ── Load inventory from Supabase and block out-of-stock items ──
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/inventory?select=dish,in_stock&in_stock=eq.false', {
+        headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON }
+      });
+      if (res.ok) {
+        const outOfStock = await res.json();
+        outOfStock.forEach(({ dish }) => {
+          // Block in all 3 order flows: res, tw, to
+          ['resc-', 'twc-', 'toc-'].forEach(prefix => {
+            const chip = document.getElementById(prefix + dish);
+            if (!chip) return;
+            chip.classList.add('out-of-stock-chip');
+            // Disable qty buttons
+            chip.querySelectorAll('.qty-btn').forEach(b => b.disabled = true);
+            // Show out-of-stock badge
+            const badge = document.createElement('span');
+            badge.className = 'oos-badge';
+            badge.textContent = 'Out of Stock';
+            chip.appendChild(badge);
+          });
+        });
+      }
+    } catch(e) { /* silently fail — don't block ordering */ }
+
+    // Auto-open table order modal if URL has ?table=
     const params = new URLSearchParams(window.location.search);
     const tableNum = params.get('table');
     if (tableNum || window.location.hash === '#order') {
@@ -2711,7 +2757,6 @@
       if (tableNum) {
         const sel = document.getElementById('to_table');
         if (sel) {
-          // Try to match option value
           for (let opt of sel.options) {
             if (opt.value === tableNum || opt.text.includes(tableNum)) {
               sel.value = opt.value;
