@@ -814,6 +814,104 @@
   }
 
   /* ─── PRINT BILL ─── */
+  /* ─── INVENTORY ─── */
+  .inv-category {
+    margin-bottom: 2rem;
+  }
+  .inv-category-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.55rem;
+    font-weight: 300;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .inv-category-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--divider);
+  }
+  .inv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.5rem;
+  }
+  .inv-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.9rem;
+    background: var(--mid);
+    border: 1px solid var(--divider);
+    transition: border-color 0.2s, background 0.2s;
+    gap: 0.75rem;
+  }
+  .inv-item.out-of-stock {
+    background: rgba(224,96,96,0.06);
+    border-color: rgba(224,96,96,0.25);
+  }
+  .inv-item-name {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 300;
+    color: var(--cream);
+    flex: 1;
+  }
+  .inv-item.out-of-stock .inv-item-name {
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+  .inv-item-price {
+    font-size: 0.6rem;
+    font-weight: 300;
+    color: var(--gold-dim);
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+  .inv-badge {
+    font-size: 0.45rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.4rem;
+    flex-shrink: 0;
+  }
+  .inv-badge.in  { color: var(--green); border: 1px solid rgba(106,191,122,0.3); }
+  .inv-badge.out { color: var(--red);   border: 1px solid rgba(224,96,96,0.3); }
+
+  /* Toggle switch */
+  .inv-toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .inv-toggle input { opacity: 0; width: 0; height: 0; }
+  .inv-toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(224,96,96,0.4);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.25s;
+  }
+  .inv-toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s;
+  }
+  .inv-toggle input:checked + .inv-toggle-slider { background: rgba(106,191,122,0.6); }
+  .inv-toggle input:checked + .inv-toggle-slider::before { transform: translateX(16px); }
+
   .btn-print {
     display: inline-flex;
     align-items: center;
@@ -1036,6 +1134,9 @@
     <button class="tab-btn-admin" id="tabDining" onclick="switchTab('dining')">
       🪑 Dining Orders <span class="tab-badge" style="background:#7ec8e3;color:#0e0c0a;" id="tabBadgeDining">0</span>
     </button>
+    <button class="tab-btn-admin" id="tabInventory" onclick="switchTab('inventory')">
+      📦 Inventory
+    </button>
   </div>
 
   <!-- ══════════════════════════════════════════ -->
@@ -1197,6 +1298,34 @@
 
   </div>
 
+  <!-- ══════════════════════════════════════════ -->
+  <!-- ── INVENTORY PANEL ──                      -->
+  <!-- ══════════════════════════════════════════ -->
+  <div id="panelInventory" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+
+    <div class="panel-header">
+      <div class="panel-header-left">
+        <div class="panel-header-icon" style="background:rgba(201,168,76,0.15);color:var(--gold);font-size:1.4rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;">📦</div>
+        <div>
+          <div class="panel-header-eyebrow">Coastal Dine · Stock Control</div>
+          <div class="panel-header-title">Item <span style="color:var(--gold);font-style:italic;">Inventory</span></div>
+          <div class="panel-header-desc">Toggle items off when out of stock — customers won't be able to order them.</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center;">
+        <span id="outOfStockCount" style="font-family:'Raleway',sans-serif;font-size:0.62rem;font-weight:300;letter-spacing:0.2em;color:var(--red);"></span>
+        <button class="btn-outline" style="font-size:0.55rem;padding:0.4rem 0.9rem;" onclick="markAllInStock()">✓ All In Stock</button>
+      </div>
+    </div>
+
+    <div class="panel-divider" style="border-top:1px solid var(--gold);margin:1rem 2rem 0;opacity:0.3;"></div>
+
+    <div style="flex:1;overflow-y:auto;padding:1.5rem 2rem;" id="inventoryContent">
+      <div class="state-box"><div class="state-icon" style="animation:spin 1s linear infinite;display:inline-block;">⟳</div><div class="state-title">Loading inventory…</div></div>
+    </div>
+
+  </div>
+
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1324,12 +1453,13 @@
 
   function switchTab(tab) {
     activeTab = tab;
-    ['reservations','takeaway','dining'].forEach(t => {
+    ['reservations','takeaway','dining','inventory'].forEach(t => {
       const btn   = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
       const panel = document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1));
       if (btn)   btn.classList.toggle('active', t === tab);
       if (panel) panel.style.display = t === tab ? 'flex' : 'none';
     });
+    if (tab === 'inventory') renderInventory();
   }
 
   // ─── DATA ──────────────────────────────────────────────────
@@ -1351,6 +1481,8 @@
       if (resRes.ok)    allReservations   = await resRes.json();
       if (twRes.ok)     allTakeawayOrders = await twRes.json();
       if (diningRes.ok) allDiningOrders   = await diningRes.json();
+
+      await loadInventory();
 
       updateStats();
       renderTable();
@@ -2106,6 +2238,137 @@
   }
 
   // ─── HELPERS ───────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════
+  // INVENTORY
+  // ══════════════════════════════════════════════════════
+  const MENU_CATEGORIES = [
+    {
+      label: '🍗 Chicken Starters',
+      items: ['Chicken Popcorn','Chicken Lollipop','Chicken 65','Chicken Wings','Chicken Pakora','Chicken Strips']
+    },
+    {
+      label: '🍚 Rice & Combos',
+      items: ['Chicken Biryani Combo','Mutton Biryani Combo','Ghee Rice Combo','Boiled Rice with Curry','Chicken Thali','Mutton Thali']
+    },
+    {
+      label: '🫓 Breads',
+      items: ['Kerala Parota','Chapathi','Rice Pathiri','Idiyappam','Plain Dosa']
+    },
+    {
+      label: '🍛 Curries & Mains',
+      items: ['Chicken Ghee Roast','Chicken Sukka','Mutton Rogan Josh','Beef Fry','Chicken Curry','Mutton Stew','Beef Masala']
+    },
+    {
+      label: '🍮 Desserts',
+      items: ['Gadbad Ice Cream','Caramel Custard','Gulab Jamun','Kesari Bath','Payasam']
+    },
+    {
+      label: '🥤 Beverages',
+      items: ['Fresh Lime Soda','Mango Lassi','Buttermilk','Cold Coffee','Falooda','Soft Drinks']
+    }
+  ];
+
+  // Local state: dish → true (in stock) / false (out of stock)
+  let inventoryState = {};
+
+  async function loadInventory() {
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/inventory?select=*', { headers: SB_HEADERS });
+      if (res.ok) {
+        const rows = await res.json();
+        // Default everything to in-stock, then apply DB overrides
+        MENU_CATEGORIES.forEach(cat => cat.items.forEach(d => inventoryState[d] = true));
+        rows.forEach(r => { inventoryState[r.dish] = r.in_stock; });
+      }
+    } catch(e) {
+      // If table doesn't exist yet, everything defaults to in-stock
+      MENU_CATEGORIES.forEach(cat => cat.items.forEach(d => inventoryState[d] = true));
+    }
+  }
+
+  function renderInventory() {
+    const el = document.getElementById('inventoryContent');
+    el.innerHTML = '';
+
+    let outCount = 0;
+    MENU_CATEGORIES.forEach(cat => {
+      const div = document.createElement('div');
+      div.className = 'inv-category';
+      div.innerHTML = `<div class="inv-category-title">${cat.label}</div>`;
+      const grid = document.createElement('div');
+      grid.className = 'inv-grid';
+
+      cat.items.forEach(dish => {
+        const inStock = inventoryState[dish] !== false;
+        if (!inStock) outCount++;
+        const price = PRICES[dish] ? `SAR ${PRICES[dish]}` : '';
+        const item = document.createElement('div');
+        item.className = 'inv-item' + (inStock ? '' : ' out-of-stock');
+        item.id = 'inv-item-' + dish.replace(/\s+/g,'-');
+        item.innerHTML = `
+          <div>
+            <div class="inv-item-name">${dish}</div>
+            <div class="inv-item-price">${price}</div>
+          </div>
+          <span class="inv-badge ${inStock ? 'in' : 'out'}" id="inv-badge-${dish.replace(/\s+/g,'-')}">${inStock ? 'In Stock' : 'Out'}</span>
+          <label class="inv-toggle">
+            <input type="checkbox" ${inStock ? 'checked' : ''} onchange="toggleItem('${dish}', this.checked)">
+            <span class="inv-toggle-slider"></span>
+          </label>`;
+        grid.appendChild(item);
+      });
+
+      div.appendChild(grid);
+      el.appendChild(div);
+    });
+
+    // Update out-of-stock counter
+    const countEl = document.getElementById('outOfStockCount');
+    countEl.textContent = outCount > 0 ? `${outCount} item${outCount>1?'s':''} out of stock` : '';
+  }
+
+  async function toggleItem(dish, inStock) {
+    // Optimistically update UI
+    inventoryState[dish] = inStock;
+    const key = dish.replace(/\s+/g,'-');
+    const itemEl  = document.getElementById('inv-item-' + key);
+    const badgeEl = document.getElementById('inv-badge-' + key);
+    if (itemEl)  itemEl.classList.toggle('out-of-stock', !inStock);
+    if (badgeEl) { badgeEl.textContent = inStock ? 'In Stock' : 'Out'; badgeEl.className = `inv-badge ${inStock ? 'in' : 'out'}`; }
+
+    // Update out-of-stock counter
+    const outCount = Object.values(inventoryState).filter(v => !v).length;
+    document.getElementById('outOfStockCount').textContent = outCount > 0 ? `${outCount} item${outCount>1?'s':''} out of stock` : '';
+
+    // Save to Supabase (upsert)
+    try {
+      await fetch(SUPABASE_URL + '/rest/v1/inventory', {
+        method: 'POST',
+        headers: { ...SB_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
+        body: JSON.stringify({ dish, in_stock: inStock })
+      });
+      showToast(inStock ? `✓ ${dish} — back in stock` : `✕ ${dish} — marked out of stock`);
+    } catch(e) {
+      showToast('⚠ Could not save — check Supabase table');
+    }
+  }
+
+  async function markAllInStock() {
+    if (!confirm('Mark ALL items as in stock?')) return;
+    MENU_CATEGORIES.forEach(cat => cat.items.forEach(d => inventoryState[d] = true));
+    renderInventory();
+    // Bulk upsert
+    const rows = MENU_CATEGORIES.flatMap(cat => cat.items.map(dish => ({ dish, in_stock: true })));
+    try {
+      await fetch(SUPABASE_URL + '/rest/v1/inventory', {
+        method: 'POST',
+        headers: { ...SB_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
+        body: JSON.stringify(rows)
+      });
+      showToast('✓ All items marked in stock');
+    } catch(e) { showToast('⚠ Could not save'); }
+  }
+
   function escHtml(str) {
     return String(str||'')
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
