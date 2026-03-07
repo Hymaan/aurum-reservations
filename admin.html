@@ -908,6 +908,26 @@
     margin: 10px 0 5px;
   }
   .bill-item { font-size: 11px; padding: 3px 0; border-bottom: 1px dotted #ddd; color: #111; }
+  .bill-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px dotted #e0e0e0;
+    font-size: 11px;
+  }
+  .bill-item-name { color: #111; flex: 1; }
+  .bill-item-price { color: #333; font-weight: 500; white-space: nowrap; margin-left: 8px; }
+  .bill-grand-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 2px solid #111;
+    font-size: 12px;
+    font-weight: 700;
+    color: #111;
+  }
   .bill-footer {
     text-align: center;
     margin-top: 12px;
@@ -1864,6 +1884,20 @@
   }
 
   // ─── PRINT BILL ────────────────────────────────────────────
+  // ─── MENU PRICES (SAR) — must match restaurant-menu.html ────
+  const PRICES = {
+    'Chicken Popcorn':28,'Chicken Lollipop':38,'Chicken 65':32,
+    'Chicken Wings':35,'Chicken Pakora':28,'Chicken Strips':30,
+    'Chicken Biryani Combo':52,'Mutton Biryani Combo':62,
+    'Ghee Rice Combo':45,'Boiled Rice with Curry':38,
+    'Chicken Thali':65,'Mutton Thali':75,
+    'Kerala Parota':8,'Chapathi':7,'Rice Pathiri':9,'Idiyappam':10,'Plain Dosa':18,
+    'Chicken Ghee Roast':48,'Chicken Sukka':45,'Mutton Rogan Josh':58,
+    'Beef Fry':48,'Chicken Curry':42,'Mutton Stew':55,'Beef Masala':48,
+    'Gadbad Ice Cream':22,'Caramel Custard':18,'Gulab Jamun':16,'Kesari Bath':14,'Payasam':16,
+    'Fresh Lime Soda':14,'Mango Lassi':18,'Buttermilk':12,'Cold Coffee':20,'Falooda':22,'Soft Drinks':10
+  };
+
   function printBill(type, id) {
     let r, billHTML = '';
     const now = new Date().toLocaleString('en-US', {
@@ -1877,8 +1911,22 @@
       const dateStr = r.date
         ? new Date(r.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
         : '—';
+      let dishTotal = 0;
       const dishes = r.dishes
-        ? r.dishes.split(',').map(d => `<div class="bill-item">· ${escHtml(d.trim())}</div>`).join('')
+        ? r.dishes.split(',').map(d => {
+            const raw = d.trim();
+            // Parse "2x Chicken 65" or "Chicken 65"
+            const m = raw.match(/^(\d+)x\s+(.+)$/);
+            const qty = m ? parseInt(m[1]) : 1;
+            const name = m ? m[2] : raw;
+            const price = PRICES[name] || 0;
+            const lineTotal = qty * price;
+            dishTotal += lineTotal;
+            return `<div class="bill-item-row">
+              <span class="bill-item-name">${escHtml(qty > 1 ? qty + '× ' + name : name)}</span>
+              <span class="bill-item-price">${price ? 'SAR ' + lineTotal : '—'}</span>
+            </div>`;
+          }).join('')
         : '<div class="bill-item" style="color:#888;font-style:italic;">No dishes pre-ordered</div>';
       billHTML = `
         <div class="bill-type">Reservation Confirmation</div>
@@ -1894,6 +1942,7 @@
         <hr class="bill-divider">
         <div class="bill-items-title">Pre-Ordered Dishes</div>
         ${dishes}
+        ${dishTotal > 0 ? `<div class="bill-grand-total"><span>Estimated Total</span><span>SAR ${dishTotal}</span></div>` : ''}
         ${r.notes ? `<hr class="bill-divider"><div class="bill-row"><span class="bill-row-label">Notes</span><span class="bill-row-value">${escHtml(r.notes)}</span></div>` : ''}`;
 
     } else if (type === 'takeaway') {
@@ -1902,8 +1951,21 @@
       const pickupDate = r.pickup_date
         ? new Date(r.pickup_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
         : '—';
+      let orderTotal = 0;
       const items = r.items
-        ? r.items.split(',').map(d => `<div class="bill-item">· ${escHtml(d.trim())}</div>`).join('')
+        ? r.items.split(',').map(d => {
+            const raw = d.trim();
+            const m = raw.match(/^(\d+)x\s+(.+)$/);
+            const qty = m ? parseInt(m[1]) : 1;
+            const name = m ? m[2] : raw;
+            const price = PRICES[name] || 0;
+            const lineTotal = qty * price;
+            orderTotal += lineTotal;
+            return `<div class="bill-item-row">
+              <span class="bill-item-name">${escHtml(qty > 1 ? qty + '× ' + name : name)}</span>
+              <span class="bill-item-price">${price ? 'SAR ' + lineTotal : '—'}</span>
+            </div>`;
+          }).join('')
         : '<div class="bill-item" style="color:#888;font-style:italic;">No items</div>';
       billHTML = `
         <div class="bill-type">Takeaway Order</div>
@@ -1917,6 +1979,7 @@
         <hr class="bill-divider">
         <div class="bill-items-title">Items Ordered</div>
         ${items}
+        ${orderTotal > 0 ? `<div class="bill-grand-total"><span>Total</span><span>SAR ${orderTotal}</span></div>` : ''}
         ${r.notes ? `<hr class="bill-divider"><div class="bill-row"><span class="bill-row-label">Notes</span><span class="bill-row-value">${escHtml(r.notes)}</span></div>` : ''}`;
 
     } else if (type === 'dining') {
@@ -1925,8 +1988,21 @@
       const timeStr = r.created_at
         ? new Date(r.created_at).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
         : '—';
+      let orderTotal = 0;
       const items = r.items
-        ? r.items.split(',').map(d => `<div class="bill-item">· ${escHtml(d.trim())}</div>`).join('')
+        ? r.items.split(',').map(d => {
+            const raw = d.trim();
+            const m = raw.match(/^(\d+)x\s+(.+)$/);
+            const qty = m ? parseInt(m[1]) : 1;
+            const name = m ? m[2] : raw;
+            const price = PRICES[name] || 0;
+            const lineTotal = qty * price;
+            orderTotal += lineTotal;
+            return `<div class="bill-item-row">
+              <span class="bill-item-name">${escHtml(qty > 1 ? qty + '× ' + name : name)}</span>
+              <span class="bill-item-price">${price ? 'SAR ' + lineTotal : '—'}</span>
+            </div>`;
+          }).join('')
         : '<div class="bill-item" style="color:#888;font-style:italic;">No items</div>';
       billHTML = `
         <div class="bill-type">Dining Order</div>
@@ -1937,7 +2013,8 @@
         <div class="bill-row"><span class="bill-row-label">Order Time</span><span class="bill-row-value">${timeStr}</span></div>
         <hr class="bill-divider">
         <div class="bill-items-title">Items Ordered</div>
-        ${items}`;
+        ${items}
+        ${orderTotal > 0 ? `<div class="bill-grand-total"><span>Total</span><span>SAR ${orderTotal}</span></div>` : ''}`;
     }
 
     const area = document.getElementById('printBillArea');
