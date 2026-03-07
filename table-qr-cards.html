@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coastal Dine — Table QR Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Raleway:wght@200;300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Raleway', sans-serif;
+    background: #f0ece4;
+    padding: 2rem;
+    color: #1a1714;
+  }
+
+  /* ─── CONTROL PANEL ─── */
+  .controls {
+    background: #1a1714;
+    color: #f5efe0;
+    padding: 1.5rem 2rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-end;
+  }
+  .ctrl-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .ctrl-label {
+    font-size: 0.55rem;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #8a6d2f;
+  }
+  .ctrl-input {
+    background: #2c2820;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: #f5efe0;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 300;
+    padding: 0.5rem 0.75rem;
+    outline: none;
+    min-width: 220px;
+  }
+  .ctrl-input:focus { border-color: #c9a84c; }
+  .ctrl-input-sm { min-width: 80px; }
+  .ctrl-btn {
+    background: #c9a84c;
+    color: #1a1714;
+    border: none;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    height: 36px;
+    align-self: flex-end;
+  }
+  .ctrl-btn:hover { background: #e8c96e; }
+  .ctrl-btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: #c9a84c;
+  }
+  .ctrl-btn.secondary:hover { background: rgba(201,168,76,0.1); }
+
+  /* ─── GRID ─── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 85mm);
+    gap: 1.5rem;
+    justify-content: center;
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    width: 85mm;
+    background: #fff;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 7mm 6mm 6mm;
+    position: relative;
+    page-break-inside: avoid;
+  }
+  .card-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    color: #1a1714;
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .card-tagline {
+    font-size: 7px;
+    font-weight: 200;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: #8a6d2f;
+    text-align: center;
+    margin-bottom: 5mm;
+  }
+  .card-divider {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #e8c96e;
+    margin-bottom: 5mm;
+    opacity: 0.5;
+  }
+  .card-qr {
+    width: 48mm;
+    height: 48mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #f0ece4;
+    padding: 2mm;
+    margin-bottom: 4mm;
+  }
+  .card-qr canvas, .card-qr img {
+    width: 44mm !important;
+    height: 44mm !important;
+  }
+  .card-scan-label {
+    font-size: 7.5px;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #7a6e5f;
+    text-align: center;
+    margin-bottom: 4mm;
+  }
+  .card-table-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    color: #1a1714;
+    text-align: center;
+    line-height: 1;
+    margin-bottom: 1mm;
+  }
+  .card-table-label {
+    font-size: 7px;
+    font-weight: 200;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: #7a6e5f;
+    text-align: center;
+    margin-bottom: 4mm;
+  }
+  .card-divider-bottom {
+    width: 100%;
+    border: none;
+    border-top: 1px dashed #ddd;
+    margin-bottom: 3mm;
+  }
+  .card-footer {
+    font-size: 7px;
+    font-weight: 200;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #aaa;
+    text-align: center;
+    line-height: 1.8;
+  }
+  .card-ornament {
+    width: 20mm;
+    text-align: center;
+    font-size: 9px;
+    color: #c9a84c;
+    letter-spacing: 0.5em;
+    margin: 3mm 0 2mm;
+    opacity: 0.6;
+  }
+
+  /* ─── PRINT ─── */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .controls { display: none !important; }
+    .cards-grid {
+      grid-template-columns: repeat(2, 85mm);
+      gap: 5mm;
+    }
+    .card { border: 0.5pt solid #ccc; box-shadow: none; }
+  }
+
+  .status-bar {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: #8a6d2f;
+    font-size: 0.65rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <label class="ctrl-label">Your Website URL</label>
+    <input class="ctrl-input" id="siteUrl" type="text"
+      value="https://your-site.vercel.app/restaurant-menu.html"
+      placeholder="https://your-domain.com/restaurant-menu.html">
+  </div>
+  <div class="ctrl-group">
+    <label class="ctrl-label">Tables From</label>
+    <input class="ctrl-input ctrl-input-sm" id="tableFrom" type="number" value="1" min="1" max="50">
+  </div>
+  <div class="ctrl-group">
+    <label class="ctrl-label">Tables To</label>
+    <input class="ctrl-input ctrl-input-sm" id="tableTo" type="number" value="10" min="1" max="50">
+  </div>
+  <button class="ctrl-btn" onclick="generateCards()">Generate QR Cards</button>
+  <button class="ctrl-btn secondary" onclick="window.print()">🖨 Print All</button>
+</div>
+
+<div class="status-bar" id="statusBar">
+  Enter your website URL above and click Generate — one QR card per table will be created.
+</div>
+
+<div class="cards-grid" id="cardsGrid"></div>
+
+<script>
+  function generateCards() {
+    const baseUrl = document.getElementById('siteUrl').value.trim().replace(/\/$/, '');
+    const from    = parseInt(document.getElementById('tableFrom').value);
+    const to      = parseInt(document.getElementById('tableTo').value);
+    const grid    = document.getElementById('cardsGrid');
+    const status  = document.getElementById('statusBar');
+
+    if (!baseUrl) { status.textContent = '⚠ Please enter your website URL.'; return; }
+    if (from > to) { status.textContent = '⚠ "From" must be less than or equal to "To".'; return; }
+
+    grid.innerHTML = '';
+    status.textContent = `Generating QR codes for Table ${from} to Table ${to}…`;
+
+    for (let t = from; t <= to; t++) {
+      const tableLabel = 'Table ' + t;
+      const url = `${baseUrl}?table=${encodeURIComponent(tableLabel)}`;
+
+      // Card shell
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-logo">COASTAL DINE</div>
+        <div class="card-tagline">Authentic Mangalorean Cuisine</div>
+        <hr class="card-divider">
+        <div class="card-qr" id="qr-wrap-${t}"></div>
+        <div class="card-scan-label">Scan to order from your table</div>
+        <div class="card-table-num">${tableLabel}</div>
+        <div class="card-table-label">Table Number</div>
+        <hr class="card-divider-bottom">
+        <div class="card-ornament">✦ · · · ✦</div>
+        <div class="card-footer">
+          Order · Dine · Enjoy<br>
+          coastaldine.com
+        </div>`;
+      grid.appendChild(card);
+
+      // Generate QR into the wrap div
+      new QRCode(document.getElementById('qr-wrap-' + t), {
+        text: url,
+        width: 176,
+        height: 176,
+        colorDark: '#1a1714',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    status.textContent = `✓ ${to - from + 1} QR cards generated for Table ${from}–${to}. Click "🖨 Print All" to print.`;
+  }
+
+  // Auto-generate on load with defaults
+  window.addEventListener('load', generateCards);
+</script>
+</body>
+</html>
