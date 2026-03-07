@@ -812,9 +812,117 @@
     .panel-mini-stats { display: none; }
     .panel-divider { margin: 1rem 1rem 0; }
   }
+
+  /* ─── PRINT BILL ─── */
+  .btn-print {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 0.65rem 1.4rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-print:hover { background: var(--gold-light); }
+
+  @media print {
+    body * { visibility: hidden !important; }
+    #printBillArea, #printBillArea * { visibility: visible !important; }
+    #printBillArea {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100% !important;
+      background: #fff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      z-index: 99999 !important;
+    }
+  }
+
+  #printBillArea { display: none; }
+  .bill-wrap {
+    width: 80mm;
+    margin: 0 auto;
+    padding: 8mm 6mm;
+    background: #fff;
+    color: #111;
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .bill-logo {
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    color: #111;
+    margin-bottom: 2px;
+  }
+  .bill-tagline {
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  .bill-divider { border: none; border-top: 1px dashed #bbb; margin: 8px 0; }
+  .bill-type {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #333;
+    margin: 6px 0 2px;
+  }
+  .bill-ref {
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: #111;
+    margin-bottom: 8px;
+  }
+  .bill-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    margin-bottom: 3px;
+  }
+  .bill-row-label { color: #666; }
+  .bill-row-value { color: #111; font-weight: 400; text-align: right; max-width: 55mm; }
+  .bill-items-title {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #666;
+    margin: 10px 0 5px;
+  }
+  .bill-item { font-size: 11px; padding: 3px 0; border-bottom: 1px dotted #ddd; color: #111; }
+  .bill-footer {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 9px;
+    color: #888;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 1.8;
+  }
+  .bill-timestamp { text-align: center; font-size: 9px; color: #aaa; margin-top: 4px; }
 </style>
 </head>
 <body>
+<!-- PRINT BILL AREA — hidden until print triggered -->
+<div id="printBillArea"></div>
 
 <!-- ═══════════════════════════════════════════ -->
 <!--  LOGIN SCREEN                               -->
@@ -1382,7 +1490,8 @@
         <div class="detail-dishes-pills">${itemsHTML}</div>
       </div>
       ${r.notes ? `<div class="detail-notes">📝 ${escHtml(r.notes)}</div>` : ''}
-      <div style="margin-top:2rem;display:flex;gap:0.75rem;">
+      <div style="margin-top:2rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+        <button class="btn-print" onclick="printBill('takeaway',${r.id})">🖨 Print Bill</button>
         <button class="btn-danger" style="padding:0.6rem 1.25rem;" onclick="deleteTakeaway(${r.id});closeDetailModal();">Delete Order</button>
         <button class="btn-outline" style="padding:0.6rem 1.25rem;" onclick="closeDetailModal()">Close</button>
       </div>`;
@@ -1510,7 +1619,8 @@
         <div class="detail-dishes-title">Items Ordered</div>
         <div class="detail-dishes-pills">${itemsHTML}</div>
       </div>
-      <div style="margin-top:2rem;display:flex;gap:0.75rem;">
+      <div style="margin-top:2rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+        <button class="btn-print" onclick="printBill('dining',${r.id})">🖨 Print Bill</button>
         <button class="btn-danger" style="padding:0.6rem 1.25rem;" onclick="deleteDining(${r.id});closeDetailModal();">Delete Order</button>
         <button class="btn-outline" style="padding:0.6rem 1.25rem;" onclick="closeDetailModal()">Close</button>
       </div>`;
@@ -1736,8 +1846,9 @@
         <div class="detail-dishes-pills">${dishHTML}</div>
       </div>
       ${r.notes ? `<div class="detail-notes">📝 ${escHtml(r.notes)}</div>` : ''}
-      <div style="margin-top:2rem;display:flex;gap:0.75rem;">
-        <button class="btn-danger" style="padding:0.6rem 1.25rem;" onclick="deleteRow(${r.id});closeDetailModal();">Delete Reservation</button>
+      <div style="margin-top:2rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+        <button class="btn-print" onclick="printBill('reservation',${r.id})">🖨 Print Bill</button>
+        <button class="btn-danger" style="padding:0.6rem 1.25rem;" onclick="deleteRow(${r.id});closeDetailModal();">Delete</button>
         <button class="btn-outline" style="padding:0.6rem 1.25rem;" onclick="closeDetailModal()">Close</button>
       </div>`;
 
@@ -1750,6 +1861,103 @@
 
   function closeDetailModal() {
     document.getElementById('detailOverlay').classList.remove('open');
+  }
+
+  // ─── PRINT BILL ────────────────────────────────────────────
+  function printBill(type, id) {
+    let r, billHTML = '';
+    const now = new Date().toLocaleString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    if (type === 'reservation') {
+      r = allReservations.find(x => x.id === id);
+      if (!r) return;
+      const dateStr = r.date
+        ? new Date(r.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+        : '—';
+      const dishes = r.dishes
+        ? r.dishes.split(',').map(d => `<div class="bill-item">· ${escHtml(d.trim())}</div>`).join('')
+        : '<div class="bill-item" style="color:#888;font-style:italic;">No dishes pre-ordered</div>';
+      billHTML = `
+        <div class="bill-type">Reservation Confirmation</div>
+        <div class="bill-ref">${escHtml(r.ref || '—')}</div>
+        <hr class="bill-divider">
+        <div class="bill-row"><span class="bill-row-label">Guest</span><span class="bill-row-value">${escHtml(r.first)} ${escHtml(r.last)}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Phone</span><span class="bill-row-value">${escHtml(r.phone || '—')}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Email</span><span class="bill-row-value">${escHtml(r.email || '—')}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Date</span><span class="bill-row-value">${dateStr}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Time</span><span class="bill-row-value">${escHtml(r.time || '—')}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Party Size</span><span class="bill-row-value">${escHtml(r.guests || '—')}</span></div>
+        ${r.occasion ? `<div class="bill-row"><span class="bill-row-label">Occasion</span><span class="bill-row-value">${escHtml(r.occasion)}</span></div>` : ''}
+        <hr class="bill-divider">
+        <div class="bill-items-title">Pre-Ordered Dishes</div>
+        ${dishes}
+        ${r.notes ? `<hr class="bill-divider"><div class="bill-row"><span class="bill-row-label">Notes</span><span class="bill-row-value">${escHtml(r.notes)}</span></div>` : ''}`;
+
+    } else if (type === 'takeaway') {
+      r = allTakeawayOrders.find(x => x.id === id);
+      if (!r) return;
+      const pickupDate = r.pickup_date
+        ? new Date(r.pickup_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+        : '—';
+      const items = r.items
+        ? r.items.split(',').map(d => `<div class="bill-item">· ${escHtml(d.trim())}</div>`).join('')
+        : '<div class="bill-item" style="color:#888;font-style:italic;">No items</div>';
+      billHTML = `
+        <div class="bill-type">Takeaway Order</div>
+        <div class="bill-ref">${escHtml(r.ref || '—')}</div>
+        <hr class="bill-divider">
+        <div class="bill-row"><span class="bill-row-label">Customer</span><span class="bill-row-value">${escHtml(r.first)} ${escHtml(r.last)}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Phone</span><span class="bill-row-value">${escHtml(r.phone || '—')}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Email</span><span class="bill-row-value">${escHtml(r.email || '—')}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Pickup Date</span><span class="bill-row-value">${pickupDate}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Pickup Time</span><span class="bill-row-value">${escHtml(r.pickup_time || '—')}</span></div>
+        <hr class="bill-divider">
+        <div class="bill-items-title">Items Ordered</div>
+        ${items}
+        ${r.notes ? `<hr class="bill-divider"><div class="bill-row"><span class="bill-row-label">Notes</span><span class="bill-row-value">${escHtml(r.notes)}</span></div>` : ''}`;
+
+    } else if (type === 'dining') {
+      r = allDiningOrders.find(x => x.id === id);
+      if (!r) return;
+      const timeStr = r.created_at
+        ? new Date(r.created_at).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        : '—';
+      const items = r.items
+        ? r.items.split(',').map(d => `<div class="bill-item">· ${escHtml(d.trim())}</div>`).join('')
+        : '<div class="bill-item" style="color:#888;font-style:italic;">No items</div>';
+      billHTML = `
+        <div class="bill-type">Dining Order</div>
+        <div class="bill-ref">${escHtml(r.ref || '—')}</div>
+        <hr class="bill-divider">
+        <div class="bill-row"><span class="bill-row-label">Table</span><span class="bill-row-value" style="font-size:14px;font-weight:600;">${escHtml(r.table_number || '—')}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Phone</span><span class="bill-row-value">${escHtml(r.phone || '—')}</span></div>
+        <div class="bill-row"><span class="bill-row-label">Order Time</span><span class="bill-row-value">${timeStr}</span></div>
+        <hr class="bill-divider">
+        <div class="bill-items-title">Items Ordered</div>
+        ${items}`;
+    }
+
+    const area = document.getElementById('printBillArea');
+    area.innerHTML = `
+      <div class="bill-wrap">
+        <div class="bill-logo">COASTAL DINE</div>
+        <div class="bill-tagline">Authentic Mangalorean Cuisine</div>
+        <hr class="bill-divider">
+        ${billHTML}
+        <hr class="bill-divider">
+        <div class="bill-footer">
+          Thank you for choosing Coastal Dine<br>
+          We look forward to welcoming you again
+        </div>
+        <div class="bill-timestamp">Printed: ${now}</div>
+      </div>`;
+
+    area.style.display = 'block';
+    window.print();
+    area.style.display = 'none';
   }
 
   // ─── DELETE ────────────────────────────────────────────────
