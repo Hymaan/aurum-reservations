@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/restaurant-menu.html" },
+    { "src": "/restaurant-menu.html", "dest": "/restaurant-menu.html" },
+    { "src": "/admin.html", "dest": "/admin.html" },
+    { "src": "/admin", "dest": "/admin.html" }
+  ]
+}
