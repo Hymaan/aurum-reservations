@@ -1669,8 +1669,8 @@
   .tw-dish-chip {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.55rem 0.85rem;
+    gap: 0.65rem;
+    padding: 0.4rem 0.85rem 0.4rem 0.4rem;
     background: var(--mid);
     border: 1px solid rgba(201,168,76,0.1);
     transition: all 0.25s;
@@ -1678,12 +1678,38 @@
   }
   .tw-dish-chip:hover { border-color: rgba(201,168,76,0.3); }
   .tw-dish-chip.in-cart { border-color: var(--gold); background: rgba(201,168,76,0.07); }
+
+  /* ─── DISH PHOTO THUMBNAIL ─── */
+  .chip-photo {
+    width: 46px;
+    height: 46px;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: block;
+    background: var(--charcoal);
+    opacity: 0.88;
+    transition: opacity 0.2s;
+  }
+  .tw-dish-chip:hover .chip-photo,
+  .tw-dish-chip.in-cart .chip-photo { opacity: 1; }
+  .chip-photo-placeholder {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(201,168,76,0.06);
+    font-size: 1.3rem;
+    border-right: 1px solid rgba(201,168,76,0.08);
+  }
+  .chip-text { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+
   .tw-dish-chip-name {
     font-family: 'Raleway', sans-serif;
     font-size: 0.72rem;
     font-weight: 300;
     color: var(--cream);
-    flex: 1;
   }
   .tw-dish-chip.in-cart .tw-dish-chip-name { color: var(--gold-light); }
   .tw-dish-chip-price {
@@ -1716,6 +1742,118 @@
     padding: 0.1rem 0.4rem;
     flex-shrink: 0;
     margin-left: 0.25rem;
+  }
+
+  /* ─── WAIT TIME BADGE ─── */
+  .wait-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 0.55rem 1.1rem;
+    margin: 1rem auto 0;
+  }
+  .wait-badge-icon { font-size: 1.1rem; }
+  .wait-badge-text {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 300;
+    color: var(--cream);
+    letter-spacing: 0.05em;
+  }
+  .wait-badge-time {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--gold);
+  }
+
+  /* ─── BILL SPLIT ─── */
+  .split-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.25);
+    color: var(--gold-dim);
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.55rem;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+    margin-top: 0.75rem;
+    transition: all 0.2s;
+  }
+  .split-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .split-panel {
+    display: none;
+    max-width: 340px;
+    margin: 0.75rem auto 0;
+    background: rgba(201,168,76,0.05);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 1rem 1.25rem;
+    text-align: left;
+  }
+  .split-panel.open { display: block; }
+  .split-panel-title {
+    font-size: 0.5rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.75rem;
+  }
+  .split-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  .split-label { font-size: 0.7rem; font-weight: 300; color: var(--text-muted); flex: 1; }
+  .split-counter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .split-counter-btn {
+    width: 26px; height: 26px;
+    background: var(--mid);
+    border: 1px solid rgba(201,168,76,0.2);
+    color: var(--gold);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .split-counter-btn:hover { background: rgba(201,168,76,0.12); }
+  .split-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--cream);
+    min-width: 24px;
+    text-align: center;
+  }
+  .split-results { border-top: 1px solid rgba(201,168,76,0.15); padding-top: 0.75rem; }
+  .split-result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+  }
+  .split-person-label { font-size: 0.62rem; font-weight: 300; color: var(--text-muted); }
+  .split-person-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem;
+    color: var(--gold);
+  }
+  .split-remainder {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    font-style: italic;
   }
   .qty-ctrl {
     display: flex;
@@ -2723,6 +2861,7 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     initPrices();
+    injectPhotos();
 
     // ── Live inventory polling ────────────────────────────────
     // Tracks last known state so we only update chips that changed
@@ -3070,6 +3209,27 @@
       <p class="success-text">Your takeaway order has been received.<br>We'll have it ready for your pickup time.</p>
       <div id="twSuccessItems" style="max-width:380px;margin:1rem auto;text-align:left;padding:0.9rem 1.25rem;border:1px solid var(--divider);background:rgba(201,168,76,0.04);font-family:'Raleway',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gold-dim);line-height:1.9;"></div>
       <div class="success-ref" id="twRef">—</div>
+      <!-- Wait Time -->
+      <div id="twWaitBadge" class="wait-badge" style="display:none;">
+        <span class="wait-badge-icon">⏱</span>
+        <span class="wait-badge-text">Ready in approximately</span>
+        <span class="wait-badge-time" id="twWaitTime">—</span>
+        <span class="wait-badge-text">mins</span>
+      </div>
+      <!-- Bill Split -->
+      <button class="split-btn" onclick="toggleSplit('tw')">⚖ Split Bill</button>
+      <div class="split-panel" id="splitPanelTw">
+        <div class="split-panel-title">Split the Bill</div>
+        <div class="split-row">
+          <span class="split-label">Number of people</span>
+          <div class="split-counter">
+            <button class="split-counter-btn" onclick="changeSplit('tw',-1)">−</button>
+            <span class="split-num" id="splitNumTw">2</span>
+            <button class="split-counter-btn" onclick="changeSplit('tw',1)">+</button>
+          </div>
+        </div>
+        <div class="split-results" id="splitResultsTw"></div>
+      </div>
       <button class="btn-gold" onclick="closeTakeaway()" style="border:none;margin-top:1.5rem;"><span>Close</span></button>
     </div>
 
@@ -3218,6 +3378,9 @@
           .map(([d,q]) => `&nbsp;&nbsp;× ${q} &nbsp;${d}`).join('<br>');
       document.getElementById('twRef').textContent = ref;
       document.getElementById('twSuccess').classList.add('show');
+      // Wait time + bill split
+      setSplitTotal('tw', cartTotal(twCart));
+      fetchAndShowWaitTime('twWaitBadge', 'twWaitTime');
 
     } catch(err) {
       document.getElementById('twStep3Error').textContent = 'Something went wrong: ' + err.message;
@@ -3329,6 +3492,27 @@
       <p class="success-text">Your order is on its way to the kitchen.<br>We'll bring it to your table shortly.</p>
       <div id="toSuccessItems" style="max-width:380px;margin:1rem auto;text-align:left;padding:0.9rem 1.25rem;border:1px solid var(--divider);background:rgba(201,168,76,0.04);font-family:'Raleway',sans-serif;font-size:0.72rem;font-weight:300;color:var(--gold-dim);line-height:2;"></div>
       <div class="success-ref" id="toRef">—</div>
+      <!-- Wait Time -->
+      <div id="toWaitBadge" class="wait-badge" style="display:none;">
+        <span class="wait-badge-icon">⏱</span>
+        <span class="wait-badge-text">Arrives at your table in approx.</span>
+        <span class="wait-badge-time" id="toWaitTime">—</span>
+        <span class="wait-badge-text">mins</span>
+      </div>
+      <!-- Bill Split -->
+      <button class="split-btn" onclick="toggleSplit('to')">⚖ Split Bill</button>
+      <div class="split-panel" id="splitPanelTo">
+        <div class="split-panel-title">Split the Bill</div>
+        <div class="split-row">
+          <span class="split-label">Number of people</span>
+          <div class="split-counter">
+            <button class="split-counter-btn" onclick="changeSplit('to',-1)">−</button>
+            <span class="split-num" id="splitNumTo">2</span>
+            <button class="split-counter-btn" onclick="changeSplit('to',1)">+</button>
+          </div>
+        </div>
+        <div class="split-results" id="splitResultsTo"></div>
+      </div>
       <button class="btn-gold" onclick="closeTableOrder()" style="border:none;margin-top:1.5rem;"><span>Close</span></button>
     </div>
   </div>
@@ -3409,6 +3593,9 @@
         Object.entries(toCart).filter(([,v])=>v>0).map(([d,q])=>`× ${q} &nbsp;${d}`).join('<br>');
       document.getElementById('toRef').textContent = ref;
       document.getElementById('toSuccess').classList.add('show');
+      // Wait time + bill split
+      setSplitTotal('to', cartTotal(toCart));
+      fetchAndShowWaitTime('toWaitBadge', 'toWaitTime');
     } catch(err) {
       document.getElementById('toOrderError').textContent = 'Error: ' + err.message;
       document.getElementById('toOrderError').style.display = 'block';
@@ -3416,6 +3603,177 @@
       document.getElementById('toSubmitText').textContent = 'Place Order ✦';
     }
   }
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════
+// FEATURE 1 — DISH PHOTOS
+// ══════════════════════════════════════════════════════
+const DISH_PHOTOS = {
+  // Chicken Starters
+  'Chicken Popcorn':      'https://images.unsplash.com/photo-1562967916-eb82221dfb92?w=80&h=80&fit=crop&q=75',
+  'Chicken Lollipop':     'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=80&h=80&fit=crop&q=75',
+  'Chicken 65':           'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=80&h=80&fit=crop&q=75',
+  'Chicken Wings':        'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=80&h=80&fit=crop&q=75',
+  'Chicken Pakora':       'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=80&h=80&fit=crop&q=75',
+  'Chicken Strips':       'https://images.unsplash.com/photo-1513639776629-7b61b0ac49cb?w=80&h=80&fit=crop&q=75',
+  // Rice & Combos
+  'Chicken Biryani Combo':'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=80&h=80&fit=crop&q=75',
+  'Mutton Biryani Combo': 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=80&h=80&fit=crop&q=75',
+  'Ghee Rice Combo':      'https://images.unsplash.com/photo-1536304993881-ff86e0c9b17d?w=80&h=80&fit=crop&q=75',
+  'Boiled Rice with Curry':'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=80&h=80&fit=crop&q=75',
+  'Chicken Thali':        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=80&h=80&fit=crop&q=75',
+  'Mutton Thali':         'https://images.unsplash.com/photo-1546069901-571ac1e21bab?w=80&h=80&fit=crop&q=75',
+  // Breads
+  'Kerala Parota':        'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=80&h=80&fit=crop&q=75',
+  'Chapathi':             'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=80&h=80&fit=crop&q=75',
+  'Rice Pathiri':         'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=80&h=80&fit=crop&q=75',
+  'Idiyappam':            'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=80&h=80&fit=crop&q=75',
+  'Plain Dosa':           'https://images.unsplash.com/photo-1601050690117-a55b89aa3bd5?w=80&h=80&fit=crop&q=75',
+  // Mains & Curries
+  'Chicken Ghee Roast':   'https://images.unsplash.com/photo-1574653853027-5382a3d23a15?w=80&h=80&fit=crop&q=75',
+  'Chicken Sukka':        'https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=80&h=80&fit=crop&q=75',
+  'Mutton Rogan Josh':    'https://images.unsplash.com/photo-1545247181-516773cae754?w=80&h=80&fit=crop&q=75',
+  'Beef Fry':             'https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=80&fit=crop&q=75',
+  'Chicken Curry':        'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=80&h=80&fit=crop&q=75',
+  'Mutton Stew':          'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=80&h=80&fit=crop&q=75',
+  'Beef Masala':          'https://images.unsplash.com/photo-1574484284002-952d92456975?w=80&h=80&fit=crop&q=75',
+  // Desserts
+  'Gadbad Ice Cream':     'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=80&h=80&fit=crop&q=75',
+  'Caramel Custard':      'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=80&h=80&fit=crop&q=75',
+  'Gulab Jamun':          'https://images.unsplash.com/photo-1666101028161-d887cbfb4a9e?w=80&h=80&fit=crop&q=75',
+  'Kesari Bath':          'https://images.unsplash.com/photo-1598110750624-2f97bb7e97b1?w=80&h=80&fit=crop&q=75',
+  'Payasam':              'https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=80&h=80&fit=crop&q=75',
+  // Beverages
+  'Fresh Lime Soda':      'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=80&h=80&fit=crop&q=75',
+  'Mango Lassi':          'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=80&h=80&fit=crop&q=75',
+  'Buttermilk':           'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=80&h=80&fit=crop&q=75',
+  'Cold Coffee':          'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=80&h=80&fit=crop&q=75',
+  'Falooda':              'https://images.unsplash.com/photo-1582824741793-5a7c9fb6bad5?w=80&h=80&fit=crop&q=75',
+  'Soft Drinks':          'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=80&h=80&fit=crop&q=75',
+};
+
+// Category emoji fallback
+const DISH_EMOJI = {
+  'Chicken Popcorn':'🍗','Chicken Lollipop':'🍗','Chicken 65':'🍗','Chicken Wings':'🍗','Chicken Pakora':'🍗','Chicken Strips':'🍗',
+  'Chicken Biryani Combo':'🍚','Mutton Biryani Combo':'🍚','Ghee Rice Combo':'🍚','Boiled Rice with Curry':'🍚','Chicken Thali':'🍱','Mutton Thali':'🍱',
+  'Kerala Parota':'🫓','Chapathi':'🫓','Rice Pathiri':'🫓','Idiyappam':'🫓','Plain Dosa':'🫓',
+  'Chicken Ghee Roast':'🍛','Chicken Sukka':'🍛','Mutton Rogan Josh':'🍛','Beef Fry':'🥩','Chicken Curry':'🍛','Mutton Stew':'🍛','Beef Masala':'🥩',
+  'Gadbad Ice Cream':'🍨','Caramel Custard':'🍮','Gulab Jamun':'🟤','Kesari Bath':'🟡','Payasam':'🥣',
+  'Fresh Lime Soda':'🍋','Mango Lassi':'🥭','Buttermilk':'🥛','Cold Coffee':'☕','Falooda':'🥤','Soft Drinks':'🥤',
+};
+
+function injectPhotos() {
+  // Inject into all chips across all 3 flows
+  ['resc-','twc-','toc-'].forEach(prefix => {
+    Object.keys(DISH_PHOTOS).forEach(dish => {
+      const chip = document.getElementById(prefix + dish);
+      if (!chip) return;
+      // Wrap existing content in chip-text div
+      const nameEl  = chip.querySelector('.tw-dish-chip-name');
+      const priceEl = chip.querySelector('.tw-dish-chip-price');
+      const qtyEl   = chip.querySelector('.qty-ctrl');
+      if (!nameEl || chip.querySelector('.chip-photo, .chip-photo-placeholder')) return;
+
+      // Build photo element
+      const photoUrl = DISH_PHOTOS[dish];
+      let photoEl;
+      if (photoUrl) {
+        photoEl = document.createElement('img');
+        photoEl.className = 'chip-photo';
+        photoEl.src = photoUrl;
+        photoEl.alt = dish;
+        photoEl.loading = 'lazy';
+        photoEl.onerror = function() {
+          // Fallback to emoji placeholder if image fails
+          const placeholder = document.createElement('div');
+          placeholder.className = 'chip-photo-placeholder';
+          placeholder.textContent = DISH_EMOJI[dish] || '🍽';
+          this.replaceWith(placeholder);
+        };
+      } else {
+        photoEl = document.createElement('div');
+        photoEl.className = 'chip-photo-placeholder';
+        photoEl.textContent = DISH_EMOJI[dish] || '🍽';
+      }
+
+      // Wrap name + price in chip-text
+      const textWrap = document.createElement('div');
+      textWrap.className = 'chip-text';
+      nameEl.style.flex = '';
+      textWrap.appendChild(nameEl);
+      if (priceEl) textWrap.appendChild(priceEl);
+
+      // Rebuild chip: photo | text | qty
+      chip.innerHTML = '';
+      chip.appendChild(photoEl);
+      chip.appendChild(textWrap);
+      if (qtyEl) chip.appendChild(qtyEl);
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 2 — BILL SPLIT
+// ══════════════════════════════════════════════════════
+const splitState = { tw: { n: 2, total: 0 }, to: { n: 2, total: 0 } };
+
+function toggleSplit(flow) {
+  const panel = document.getElementById('splitPanel' + (flow === 'tw' ? 'Tw' : 'To'));
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) renderSplit(flow);
+}
+
+function changeSplit(flow, delta) {
+  const state = splitState[flow];
+  state.n = Math.max(2, Math.min(20, state.n + delta));
+  document.getElementById('splitNum' + (flow === 'tw' ? 'Tw' : 'To')).textContent = state.n;
+  renderSplit(flow);
+}
+
+function renderSplit(flow) {
+  const state = splitState[flow];
+  const resultsEl = document.getElementById('splitResults' + (flow === 'tw' ? 'Tw' : 'To'));
+  const total = state.total;
+  if (!total || !resultsEl) return;
+
+  const perPerson = Math.floor(total / state.n);
+  const remainder = total % state.n;
+
+  let html = '';
+  for (let i = 1; i <= state.n; i++) {
+    const amt = i <= remainder ? perPerson + 1 : perPerson;
+    html += `<div class="split-result-row">
+      <span class="split-person-label">Person ${i}</span>
+      <span class="split-person-amount">SAR ${amt}</span>
+    </div>`;
+  }
+  if (remainder > 0) {
+    html += `<div class="split-remainder">* SAR rounded to nearest whole number</div>`;
+  }
+  resultsEl.innerHTML = html;
+}
+
+function setSplitTotal(flow, total) {
+  splitState[flow].total = total;
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 3 — WAIT TIME
+// ══════════════════════════════════════════════════════
+async function fetchAndShowWaitTime(badgeId, timeId) {
+  try {
+    const res = await fetch(SUPABASE_URL + "/rest/v1/settings?key=eq.wait_time&select=value", {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON }
+    });
+    if (!res.ok) return;
+    const rows = await res.json();
+    if (rows.length && rows[0].value && rows[0].value !== '0') {
+      document.getElementById(timeId).textContent = rows[0].value;
+      document.getElementById(badgeId).style.display = 'inline-flex';
+    }
+  } catch(e) { /* silent */ }
+}
 </script>
 
 </body>
