@@ -427,12 +427,43 @@
     letter-spacing: 0.05em;
   }
 
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.4rem;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .status-badge.expired {
+    background: rgba(214,64,64,0.12);
+    color: #e57373;
+    border: 1px solid rgba(214,64,64,0.4);
+  }
+  .status-badge.due-soon {
+    background: rgba(230,170,60,0.14);
+    color: #e8b34d;
+    border: 1px solid rgba(230,170,60,0.45);
+    animation: pulseBadge 1.4s ease-in-out infinite;
+  }
+  @keyframes pulseBadge {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.45; }
+  }
+
   .btn-delete {
     background: none;
     border: 1px solid rgba(200,50,50,0.2);
     color: rgba(200,100,100,0.5);
     font-family: 'Raleway', sans-serif;
     font-size: 0.55rem;
+
     letter-spacing: 0.15em;
     padding: 0.3rem 0.65rem;
     cursor: pointer;
@@ -1398,6 +1429,18 @@
     manager: 'manager123'
   };
 
+  // ── SECRET URL TOKEN GUARD ──────────────────────────────────
+  // Page only works when accessed via the correct secret filename
+  // Anyone visiting /admin.html or guessing wrong gets redirected away
+  const SECRET_TOKEN = 'cd-staff-7x9k';
+  (function() {
+    const path = window.location.pathname;
+    if (!path.includes(SECRET_TOKEN)) {
+      // Redirect impostors to the main menu silently
+      window.location.replace('/index.html');
+    }
+  })();
+
   const SUPABASE_URL     = 'https://gqpnowrxypuxbrkqegdf.supabase.co';
   const SUPABASE_SERVICE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxcG5vd3J4eXB1eGJya3FlZ2RmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjUyNzIxNSwiZXhwIjoyMDg4MTAzMjE1fQ.xrnCgzpUWjNNMGsWW14x5HbHeyiK7Ucy0T7-Wh6LjLE';
 
@@ -1491,6 +1534,92 @@
   let allTakeawayOrders = [];
   let allDiningOrders   = [];
 
+  // ── ORDER TIMER / EXPIRY TRACKING ────────────────────────────
+  let currentWaitTimeMins = 0;          // dining: minutes until food arrives (from settings)
+  const notifiedDueSoon   = new Set();  // ids we've already alerted admin about ("key:id")
+
+  // Convert "7:30 PM" style strings to 24h "19:30:00" for Date parsing
+  function to24h(timeStr) {
+    if (!timeStr) return null;
+    const m = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!m) return null;
+    let h = parseInt(m[1], 10);
+    const min = m[2];
+    const ap  = m[3].toUpperCase();
+    if (ap === 'PM' && h !== 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    return String(h).padStart(2,'0') + ':' + min + ':00';
+  }
+
+  // Returns a JS Date representing when the order is "due", or null if unknown
+  function getDueDate(kind, r) {
+    try {
+      if (kind === 'res') {
+        if (!r.date || !r.time) return null;
+        const t = to24h(r.time);
+        if (!t) return null;
+        return new Date(r.date + 'T' + t);
+      }
+      if (kind === 'tw') {
+        if (!r.pickup_date || !r.pickup_time) return null;
+        const t = to24h(r.pickup_time);
+        if (!t) return null;
+        return new Date(r.pickup_date + 'T' + t);
+      }
+      if (kind === 'dine') {
+        if (!r.created_at || !currentWaitTimeMins) return null;
+        return new Date(new Date(r.created_at).getTime() + currentWaitTimeMins * 60000);
+      }
+    } catch (e) { return null; }
+    return null;
+  }
+
+  // Returns { state:'expired'|'soon'|null, mins:number, due:Date|null }
+  function getOrderTimerState(kind, r) {
+    const due = getDueDate(kind, r);
+    if (!due || isNaN(due.getTime())) return { state: null, mins: null, due: null };
+    const diffMs  = due.getTime() - Date.now();
+    const diffMin = Math.ceil(diffMs / 60000);
+    if (diffMs < 0)        return { state: 'expired', mins: diffMin, due };
+    if (diffMin <= 5)      return { state: 'soon',    mins: diffMin, due };
+    return { state: null, mins: diffMin, due };
+  }
+
+  function renderStatusBadge(kind, r) {
+    const t = getOrderTimerState(kind, r);
+    if (t.state === 'expired') {
+      const lateBy = Math.abs(t.mins);
+      return `<span class="status-badge expired">✗ Expired${lateBy > 0 ? ' · ' + lateBy + 'm ago' : ''}</span>`;
+    }
+    if (t.state === 'soon') {
+      return `<span class="status-badge due-soon">⏰ Due in ${Math.max(t.mins,0)}m</span>`;
+    }
+    return '';
+  }
+
+  // Scans current orders, fires an admin notification the first time an
+  // order crosses into the "due in ≤5 minutes" window.
+  function checkOrderTimers() {
+    const checks = [
+      ['res',  allReservations,   r => `Reservation — <strong>${escHtml(r.first||'')} ${escHtml(r.last||'')}</strong> due in ${'{m}'} min · ${escHtml(r.date||'')} ${escHtml(r.time||'')}`],
+      ['tw',   allTakeawayOrders, r => `Takeaway — <strong>${escHtml(r.first||'')} ${escHtml(r.last||'')}</strong> pickup due in ${'{m}'} min`],
+      ['dine', allDiningOrders,   r => `Dining — <strong>${escHtml(r.table_number||'')}</strong> food due in ${'{m}'} min`]
+    ];
+
+    checks.forEach(([kind, list, msgFn]) => {
+      list.forEach(r => {
+        const key = kind + ':' + r.id;
+        const t = getOrderTimerState(kind, r);
+        if (t.state === 'soon' && !notifiedDueSoon.has(key)) {
+          notifiedDueSoon.add(key);
+          showNotif(kind === 'res' ? 'res' : kind === 'tw' ? 'tw' : 'dine',
+            msgFn(r).replace('{m}', Math.max(t.mins, 0)));
+          playChime();
+        }
+      });
+    });
+  }
+
   async function loadData() {
     document.getElementById('tableWrap').innerHTML      = `<div class="state-box"><div class="state-icon" style="animation:spin 1s linear infinite;display:inline-block;">⟳</div><div class="state-title">Loading reservations…</div></div>`;
     document.getElementById('twTableWrap').innerHTML    = `<div class="state-box"><div class="state-icon" style="animation:spin 1s linear infinite;display:inline-block;">⟳</div><div class="state-title">Loading takeaway orders…</div></div>`;
@@ -1508,11 +1637,13 @@
       if (diningRes.ok) allDiningOrders   = await diningRes.json();
 
       await loadInventory();
+      await loadWaitTime();
 
       updateStats();
       renderTable();
       renderTakeaway();
       renderDining();
+      checkOrderTimers();
       showToast(`✓ ${allReservations.length} reservations · ${allTakeawayOrders.length} takeaway · ${allDiningOrders.length} dining`);
     } catch (err) {
       document.getElementById('tableWrap').innerHTML = `<div class="state-box"><div class="state-icon">⚠</div><div class="state-title">Could not load data</div><div class="state-sub">${escHtml(err.message)}</div></div>`;
@@ -1607,6 +1738,7 @@
         <td>
           <div>${pickupDate}</div>
           <div class="td-muted">${escHtml(r.pickup_time||'')}</div>
+          ${renderStatusBadge('tw', r)}
         </td>
         <td class="td-dishes">${itemPills}</td>
         <td style="max-width:150px;font-size:0.68rem;color:var(--text-muted);font-style:italic;">${r.notes ? escHtml(r.notes).substring(0,60)+(r.notes.length>60?'…':'') : '—'}</td>
@@ -1739,6 +1871,7 @@
         <td>
           <div class="td-ref" style="color:#7ec8e3;">${escHtml(r.ref||'—')}</div>
           <div class="td-muted">${timeStr}</div>
+          ${renderStatusBadge('dine', r)}
         </td>
         <td>
           <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;color:var(--cream);">${escHtml(r.table_number||'—')}</div>
@@ -1932,6 +2065,7 @@
         <td>
           <div>${dateStr}</div>
           <div class="td-muted">${escHtml(r.time||'')}</div>
+          ${renderStatusBadge('res', r)}
         </td>
         <td>${escHtml(r.guests||'—')}</td>
         <td>${r.occasion ? `<span class="td-tag">${escHtml(r.occasion)}</span>` : '<span class="td-muted">—</span>'}</td>
@@ -2403,6 +2537,7 @@
         if (rows.length) {
           const sel = document.getElementById('waitTimeSelect');
           if (sel) sel.value = rows[0].value;
+          currentWaitTimeMins = parseInt(rows[0].value, 10) || 0;
         }
       }
     } catch(e) {}
@@ -2410,6 +2545,7 @@
 
   async function saveWaitTime() {
     const val = document.getElementById('waitTimeSelect').value;
+    currentWaitTimeMins = parseInt(val, 10) || 0;
     try {
       await fetch(SUPABASE_URL + '/rest/v1/settings', {
         method: 'POST',
@@ -2464,6 +2600,12 @@
       allTakeawayOrders = newTakeaways;
       allDiningOrders   = newDining;
       updateStats();
+
+      // Refresh whichever tab is visible so due/expired badges stay current
+      if (activeTab === 'reservations') renderTable();
+      if (activeTab === 'takeaway')     renderTakeaway();
+      if (activeTab === 'dining')       renderDining();
+      checkOrderTimers();
 
       if (addedRes.length > 0) {
         const r = addedRes[0];
