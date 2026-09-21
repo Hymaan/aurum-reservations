@@ -856,6 +856,30 @@
     text-transform: uppercase;
   }
 
+  /* ─── FOOTER STAFF DASHBOARD ─── */
+  .staff-dashboard-btn {
+    display: inline-block;
+    margin-top: 1.25rem;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.55rem;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    opacity: 0.65;
+    transition: all 0.3s ease;
+  }
+
+  .staff-dashboard-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    opacity: 1;
+  }
+
   /* ─── FOOTER ─── */
   .site-footer {
     background: var(--dark);
@@ -2563,6 +2587,27 @@
     </div>
   </div>
 </section>
+      <div class="course-item">
+        <span class="course-num">07</span>
+        <div class="course-dot"></div>
+        <div class="course-info">
+          <div class="course-name">Mignardises & Dessert</div>
+          <div class="course-sub">Petit fours, chocolate marquise, gold-dusted macarons</div>
+        </div>
+        <div class="course-price">—</div>
+      </div>
+    </div>
+
+    <div class="tasting-footer">
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <a href="#" class="btn-gold" onclick="openReservation(event)"><span>Reserve the Experience</span></a>
+      </div>
+      <p style="font-family:'Raleway',sans-serif;font-size:0.68rem;font-weight:200;color:var(--text-muted);margin-top:2rem;letter-spacing:0.1em;">
+        Available Daily · Lunch & Dinner · Reservations recommended for groups of 4+
+      </p>
+    </div>
+  </div>
+</section>
 
 <div class="gold-separator"></div>
 
@@ -2664,7 +2709,7 @@
     <div style="display:flex;gap:2rem;align-items:center;">
       <a href="#" style="font-family:'Raleway',sans-serif;font-size:0.6rem;font-weight:200;letter-spacing:0.25em;color:var(--text-muted);text-decoration:none;">Privacy</a>
       <a href="#" style="font-family:'Raleway',sans-serif;font-size:0.6rem;font-weight:200;letter-spacing:0.25em;color:var(--text-muted);text-decoration:none;">Terms</a>
-      <a href="/cd-staff-7x9k-dashboard.html?key=coastaldine-secret-2025" tabindex="-1" style="font-size:6px;line-height:1;color:rgba(122,110,95,0.09);text-decoration:none;letter-spacing:0;">•</a>
+      <a href="staff.html" class="staff-dashboard-btn" aria-label="Staff Dashboard">Staff</a>
     </div>
   </div>
 </footer>
